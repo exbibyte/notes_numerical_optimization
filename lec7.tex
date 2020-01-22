@@ -1,0 +1,121 @@
+\documentclass[12pt,letter]{article}
+
+%% \usepackage[fleqn]{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsfonts,amsthm,bm}
+\usepackage{breqn}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{algorithm2e}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+%% \usepackage{datetime}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{mathrsfs}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{parskip} %turns off paragraph indent
+\pagestyle{fancy}
+
+\usepackage{xcolor}
+\usepackage{mdframed}
+  
+\usetikzlibrary{arrows}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\newcommand*{\argminl}{\argmin\limits}
+
+\newcommand{\mathleft}{\@fleqntrue\@mathmargin0pt}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}} 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\ppartial}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\p}{\partial}
+\newcommand{\te}[1]{\text{#1 }}
+\newcommand{\norm}[1]{\|#1\|}
+
+\setcounter{MaxMatrixCols}{20}
+
+% remove excess vertical space for align equations
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+% \newtheorem{mdtheorem}{Theorem}
+% \newenvironment{theorem}
+% {\begin{mdframed}[
+%     backgroundcolor=green!10,
+%     topline=false,
+%     rightline=false,
+%     bottomline=false,
+%     leftline=false
+%     ]\begin{mdtheorem}}
+%     {\end{mdtheorem}\end{mdframed}}
+
+\begin {document}
+
+\lhead{Notes - Numerical Optimization, 2020/01/22}
+
+\section{2nd order conditions}
+
+\begin{theorem}
+  If $x^*$ is a local minimizer of $f:\R^n\to\R$ and $\nabla^2f(x)$ exists and is continuous in neighbourhood of $x^*$, then $\nabla f(x^*)=$ and $\nabla^2 f(x^*)$ is symmetric positive semi-definite.
+\end{theorem}
+
+\begin{proof}
+  By contrdiction.\\
+  Note from previous theorem $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is symmetric. So contrdiction must be $\nabla^2 f(x^*)$ is not PSD: $(\exists p) p^T\nabla^2 f(x^*)p <0$.\\
+  
+  By continuity of $\nabla^2 f(x)$ must have that there is an $\alpha>0$ such that:\\
+  \[\phi(t)=p^T \nabla^2 f(x^*+t\alpha p)p <0$ for all $t\in(0,1)\].\\
+  $\phi(t)=\nabla f(x^*+t\alpha p)^Tp<0$\\
+  $f(x^*+\alpha p)=f(x^*)+\alpha \nabla f(x^*)^Tp + \frac{\alpha^2}{2}p^T \nabla^2 f(x^*+t \alphap)p$ for some $t\in(0,1)$\\
+  $\nabla f(x^*)^T=0$, $\frac{\alpha^2}{2}p^T \nabla^2 f(x^*+t \alphap)p<0$\\
+  We can always choose $\alpha$ small enough such that $x^*+\alpha p\in B(x^*,r)$
+\end{proof}\\
+
+\\\\
+
+
+\begin{theorem}
+  2nd order Sufficient condition for a minimizer.\\
+  if $\nabla^2 f(x)$ exists and is continuous in a neighbourhood of $x^*$ and $\nabla f(x^*)=0$ and $\nabla^2 f(x^*)$ is symmetric positive definite, then $x^*$ is a local minimizer of $f$.
+\end{theorem}
+\begin{proof}
+  Since $\nabla^2 f(x^*)$ is symmetric postiive definite and $\nabla^2 f(x)$ is continuous in a neighbourhood of $x^*$ there exists a $\delta>0$ s.t. $\nabla^2 f(x*+p)$ is SPD for all $\norm{p}<\delta$.\\
+  $u^T \nabla^2 f(x^*+p) u > 0, \forall u \in \R^n, u\not=0$\\
+  Choose any point $x\in B(x^*,\delta),x\not=x^*$\\
+  Let $p=x-x^*$, $\norm{p}<\delta$\\
+  So $f(x)=f(x^*+p)=f(x^*)+\nabla f(x^*)^Tp+\frac{1}{2}p^T\nabla^2 f(x^*+tp)p, t\in(0,1)$\\
+  $\nabla f(x^*)^T=0$, $\frac{1}{2}p^T\nabla f(x^*)^Tp>0$, so:\\
+  $f(x)>f(x^*+p)$
+\end{proof}
+
+\begin{theorem}
+  Then if $f$ is convex, any loval minimer is a global minizer (does not imply a local minimizer is unique).
+\end{theorem}
+\begin{proof}
+  By contradiction.\\
+  Suppose $x^*$ is a local minimizer and there is some $y^*$ s.t. $f(y^*)<f(x^*)$
+  \begin{align*}
+    f(\alpha x^*)+(1-\alpha)y^*) & \leq \alpha f(x^*)+(1-\alpha)f(y^*)\\
+                                 & < \alpha f(x^*) + (1-\alpha)f(x^*)=f(x^*), \alpha < 1\\
+    z &= \alpha x^* + (1-\alpha)y^*\\
+    f(z) &< f(x^*)
+  \end{align*}
+  For any $B(x^*,r),r>0$, we can choose $\alpha<1$ s.t. $z\in B(x^*,r)$
+\end{proof}
+
+\begin{theorem}
+  If $f$ is convex, then any local minimizer is a global minimizer. In addition, if $f$ is continuously differentiable in a neighbourhood of $x^*$ and $\nabla f(x^*)=0$ then $x^*$ is a global minimizer of $f(x)$.
+\end{theorem}
+
+\end {document}
