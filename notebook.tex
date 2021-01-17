@@ -1,0 +1,172 @@
+\documentclass[8pt,letter]{article}
+
+%% \usepackage[fleqn]{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsfonts,amsthm,bm}
+\usepackage{breqn}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage[ruled,vlined,linesnumbered,lined,boxed,commentsnumbered]{algorithm2e}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+%% \usepackage{datetime}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{mathrsfs}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+\usepackage{parskip} %turns off paragraph indent
+\pagestyle{fancy}
+
+\usepackage{xcolor}
+\usepackage{mdframed}
+
+\usetikzlibrary{arrows}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\newcommand*{\argminl}{\argmin\limits}
+
+\newcommand{\mathleft}{\@fleqntrue\@mathmargin0pt}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}} 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\ppartial}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\p}{\partial}
+\newcommand{\te}[1]{\text{#1 }}
+\newcommand{\norm}[1]{\|#1\|}
+
+\setcounter{MaxMatrixCols}{20}
+
+% remove excess vertical space for align equations
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+% \newtheorem{mdtheorem}{Theorem}
+% \newenvironment{theorem}
+% {\begin{mdframed}[
+%   backgroundcolor=green!10,
+%   topline=false,
+%   rightline=false,
+%   bottomline=false,
+%   leftline=false
+%   ]\begin{mdtheorem}}
+%     {\end{mdtheorem}\end{mdframed}}
+
+\begin {document}
+
+\lhead{Notes - Numerical Optimization}
+
+\begin{multicols*}{2}
+
+  \section{General}
+
+  line search conditions:
+  \begin{align}
+    f_{k+1}^T & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k, c_1,\alpha_k \in (0,1)\\
+    \nabla f_{k+1}^T p_k & \geq c_2 \nabla f_k^T p_k, 0<c_1<c_2<1\\
+    \text{where}:&\\
+    f_{k} & = f(x_k)\\
+    f_{k+1} & = f(x_k+\alpha_k p_k)
+  \end{align}
+
+  \section{Quasi Newton}
+
+  \subsection{BFGS}
+  properties: $O(n^2)$, self correcting, slightly more iterations than Newton Method, linear convergence order and superlinear rate of convergence\\
+  
+  secant equation:
+  \begin{align*}
+    B_{k+1}(x_{k+1}-x_k) & =\nabla f_{k+1} - \nabla f_k\\
+    B_{k+1} s_k & = y_k\\
+    s_k & = \alpha_k p_k\\
+    y_k & = \nabla f_{k+1} - \nabla f_k
+  \end{align*}
+  \begin{align*}
+    B_{k+1} & \succ 0\\
+    s_k^T B_{k+1} s_k & = s^T y_k > 0\\
+  \end{align*}    
+  \begin{proof}
+    \begin{align*}
+      y_k^T s_k & = (\nabla f_{k+1} - \nabla f_k)^T s_k\\
+      \nabla f_{k+1}^T s_k & \geq c_2 \nabla f_k^T s_k\\
+      (\nabla f_{k+1} - \nabla f_k)^T s_k & \geq c_2 \nabla f_k^T s_k - \nabla f_k^T s_k\\
+      y_k^T s_k & \geq (c_2-1) \nabla f_k^T s_k\\
+      c_2 < 1, s_k \text{ is a descent dir}& \implies s_k^T y_k > 0
+    \end{align*}
+    Curvature condition holds.
+  \end{proof}
+
+  constrain $B$ by solving:
+  \begin{align*}
+    \min_B & ||B-B_k||\\
+    s.t. & \ B=B^T, Bs_k=y_k
+  \end{align*}
+
+  similarly, constrain $B$'s inverse, $H$ where it satisfy secant equation:
+  \begin{align*}
+    H_{k+1}y_k & = s_k
+  \end{align*}
+  \begin{align*}
+    \min_H & ||H-H_k||\\
+    s.t. & \ H=H^T, Hy_k=s_k
+  \end{align*}
+  using weighted Frobenius norm:
+  \begin{align*}
+    ||A||_W & := ||W^{1/2}AW^{1/2}||_F\\
+    ||X||_F & := (\sum_i \sum_j (X_{ij})^2)^{1/2}
+  \end{align*}
+  solved weight matrix $W$ satisfy $Ws_k=y_k$
+  solution given by:
+  \begin{align*}
+    H_{k+1} & = (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T) \\
+            &+ \rho_k s_k^T s_k\\
+    \rho_k & = \frac{1}{y_k^Ts_k}
+  \end{align*}
+  $W$ is the average Hessian $\bar{G}$:
+  \begin{align*}
+    \bar{G} = \int_0^1 \nabla^2 f(x_k+\tau \alpha_k p_k) d\tau
+  \end{align*}
+  
+  initial $H_0$ can be chosen approximately (eg: finite differences, $I$)
+  
+  \begin{algorithm}[H]
+    \SetKwInOut{Input}{$H_0,x_0,\epsilon>0$}\SetKwInOut{Output}{$x$}
+    \Input{inverse Hessian approx., initial point, convergence tolerance}
+    \Output{solution}
+    $k \leftarrow$ 0\\
+    \While{$||\nabla f_k|| > \epsilon$}{
+      $\alpha_k \leftarrow $ LineSearch(..)\\
+      $x_{k+1} \leftarrow x_k + \alpha_k p_k$\\
+      $s_k \leftarrow x_{x+1} - x_k$\\
+      $y_k \leftarrow \nabla f_{k+1} - \nabla f_k$\\
+      $\rho_k \leftarrow \frac{1}{y_k^Ts_k}$\\
+      $H_{k+1} \leftarrow (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T)\\
+      + \rho_k s_k^T s_k$\\
+      $k \leftarrow k+1$
+    }
+    \caption{BFGS Algorithm\label{Algo_BFGS}}
+  \end{algorithm}
+  
+  using Sherman-Morrison-Woodbury formula to obtain Hessian update equation:
+  \begin{align*}
+    B_{k+1} & = B_k - \frac{B_ks_k s_k^T B_k}{s_k^T B_k s_k} + \frac{y_k y_k^T}{y_k^T s_k}
+  \end{align*}
+  proper line search is required so that BFGS algo captures curvature information\\
+  
+  inaccurate line search can be used to reduce computation cost
+  \vfill\null
+  
+  \pagebreak
+  
+  \section{Trust Region Methods}
+  
+  
+\end {document}
