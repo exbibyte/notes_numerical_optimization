@@ -76,6 +76,7 @@
     f_{k} & = f(x_k)\\
     f_{k+1} & = f(x_k+\alpha_k p_k)
   \end{align}
+  % Todo: add section on derivatives
 
   \section{Quasi Newton}
 
@@ -112,9 +113,7 @@
 
   similarly, constrain $B$'s inverse, $H$ where it satisfy secant equation:
   \begin{align*}
-    H_{k+1}y_k & = s_k
-  \end{align*}
-  \begin{align*}
+    H_{k+1}y_k & = s_k\\
     \min_H & ||H-H_k||\\
     s.t. & \ H=H^T, Hy_k=s_k
   \end{align*}
@@ -167,6 +166,282 @@
   \pagebreak
   
   \section{Trust Region Methods}
+  idea:
+  \begin{itemize}
+  \item models local behaviour of the objective function (eg: 2nd order Taylor series)
+  \item set local region to explore, then simultaneously find direction and step size to take
+  \item region size adaptively set using results from previous iterations
+  \item step may fail due to inadequately set region, which need to be adjusted
+  \item superlinear convergence when approximate model Hessian is equal to true Hessian
+  \end{itemize}
+
+  using 2nd order Taylor series model with symmetric matrix approximating Hessian
+  \begin{align*}
+    \min_{p \in \R^n} m_k(p) & = f_k + g_k^Tp + \frac{1}{2}p^TB_kp,\ st.\ ||p||\leq \Delta_k\\
+    \Delta_k & :=\text{trust region radiius}\\
+    g_k & =\nabla f(x_k)
+  \end{align*}
   
+  full step is ($p_k=-B_k^{-1}g_k)$ taken when $B\succ 0 $ and $||B_k^{-1} g_k|| \leq \Delta_k$
+
+  evaluate goodness of model with actual function by:
+  \begin{align*}
+    &\rho_k = \frac{f(x_k)-f(x_k+p_k)}{m_k(0)-m_k(p_k)}\\
+    &action \leftarrow
+    \begin{cases}
+      \text{expand trust region} &, \rho_k \approx 1\ (agreement)\\
+      \text{shrink trust region} &, \rho_k  < 0 + \text{thresh}\\
+      \text{keep trust region} &, o/w
+    \end{cases}  
+  \end{align*}
+
+  \begin{algorithm}[H]
+    $k \leftarrow$ 0\\
+    \While{$||\nabla f_k|| > \epsilon$}{
+      $p_k \leftarrow
+      \argminl_{p} f_k + g_k^Tp + \frac{1}{2}p^TB_kp,\ st.\ ||p||\leq \Delta_k$\\
+      $\rho_k = \frac{f(x_k)-f(x_k+p_k)}{m_k(0)-m_k(p_k)}$\\
+      \uIf{$\rho_k<\gamma (:\frac{1}{4})$}{
+        $\Delta_{k+1} \leftarrow \alpha (:\frac{1}{4}) \Delta_k$
+      }
+      \uElseIf{$\rho_k> \beta (:\frac{3}{4})\ and\ ||p_k|| == \Delta_k$}{
+        $\Delta_{k+1} \leftarrow min(2 \Delta_k, \hat{\Delta})$
+      }
+      \Else{
+        $\Delta_{k+1} \leftarrow \Delta_k$
+      }
+      
+      \uIf{$\rho_k > \eta (: \in [0, \frac{1}{4}))$}{
+        $x_{k+1} \leftarrow x_k + p_k$
+      }
+      \Else{
+        $x_{k+1} \leftarrow x_k$
+      }
+    }
+    \caption{Trust Region Algorithm\label{Algo_TrustRegion}}
+  \end{algorithm}
+
+  minimizer of the 2nd order Taylor series satisfy the following:
+  \begin{align*}
+    (B+\lambda I)p^*=-g\\
+    \lambda(\Delta - ||p^*||)=0\\
+    (B+\lambda I) \succeq 0
+  \end{align*}
+  
+  solving 2nd order Taylor series using approx methods:
+  \begin{itemize}
+  \item dogleg
+  \item 2-D subspace minimization
+  \item conjugate gradient based
+  \end{itemize}
+
+  Cauchy Point:\\
+  Use 1st order approx. of model and gradient descent to get get next iterate, bounded within trust region.\\
+  
+  \subsection{Dogleg method}
+  if $B \succ 0$:\\
+  $p^B=-B^{-1}g$\\
+  $p^*=p^B$ if $\Delta \geq \|p^B\|$\\
+  $p^U=\frac{-g^Tg}{g^TBg}g$ (intermediate point along direction of steepest descent)\\
+  interpolate between $p^U$ and $p^B$:\\
+  $\tilde{p}(\tau) =
+  \begin{cases}
+    \tau p^U &, \tau_\in [0,1]\\
+    p^U + (\tau-1)(p^B-p^U) &, \tau \in [1,2]
+  \end{cases}
+  $\\
+  $B \succ 0 \implies$ $\|\tilde{p}(\tau)\|$ increases wrt. $\tau$, $m(\tilde{p}(\tau))$ decreases wrt. $\tau$\\
+
+  if $\|p^B\| \leq \Delta$: $p$ chosen at $p^B$\\
+  else $p$ chosen at intersection of $\tilde{p}(\tau)$ and trust region boudnary by solving:\\
+  $\|p^U+(\tau-1)(p^B-p^U)\|^2 = \|\Delta^2\|$
+
+  $p_k^S=\argminl_p f_k+g_k^Tp, \|p\| \leq \Delta_k$\\
+  $\tau_k = \argminl_{\tau\geq0} m_k(\tau p_k^S), \|\tau p_k^S\| \leq \Delta_k$\\
+  $p_k^S=\frac{-\Delta_k g_k|}{\|g_k\|}$\\
+  $p_k^C=\tau_k p_k^S$\\
+  $p_k^C=-\tau_k \frac{\Deltak g_k}{\|g_k\|}$\\
+  $\tau_k=\begin{cases}
+    1 &, g_k^T B_k g_k \leq 0\\
+    min(\frac{\|g_k|\^3}{\Delta_k g_k^T B_k g_k}, 1) &, o/w
+  \end{cases}$
+  
+  \vfill\null
+  \pagebreak
+
+  \subsection{Iterative Solution}
+  Idea: solve subproblem $\min_{\|p\| \leq \Delta} m(p)$ by applying Newton's method to find $\lambda$ that matches trust region radius. This is slightly more accurate per step compared to Dogleg. Use $(B+\lambda I)p^*=-g$ to solve $\min_{\|p\| \leq \Delta} m(p)$ for $\lambda$.
+
+  If $lambda=0$ and $(B+\lambda I)p^*=-g, \|p^*\| \leq \Delta$ and $(B+\lambda I) \succeq 0$: return $\lambda$\\
+  Else: find $\lambda$ s.t. $(B+\labda I) \succeq 0$ and $\|p(\lambda)\| = \Delta, p(\lambda)=-(B+\lambda I)^{-1}g$. Solve and return $\lambda$.
+  
+  Solve $\|p(\lambda)\|-\Delta=0, \lambda > \lambda_1$ via Newton's method (root finding). Approx. this to nearly a linear problem for easy solving:\\
+
+  \begin{algorithm}[H]
+    \For{$l=0,1,..$}{
+      solve $B+\lambda ^l I = R^T R$\\
+      $R^TR p_l = -g$\\
+      $R^T q_l = p_l$\\
+      $\lambda^{l+1} \leftarrow \lambda^l + (\frac{\|p_l\|}{\|q_l\|})^2(\frac{\|p_l\|-\Delta)}{\Delta})$
+      check $\lambda \geq \lambda_1$
+    }
+    \caption{Subproblem Algo\label{Algo_TrustRegionIterativeSubproblem}}
+  \end{algorithm}
+
+  
+  \vfill\null
+  \pagebreak
+  
+  \section{Conjugate Gradient}
+
+  \subsection{linear method}
+  Assuming unconstrained problem with strict convex quadratic objective function:
+  \begin{align*}
+      \frac{1}{2} x^TAx-b^Tx, A \succ 0, A^T=A
+  \end{align*}
+  
+  $\nabla(\frac{1}{2} x^TAx-b^Tx) = Ax-b$, thus $\min_x x^TAx - b^Tx$ transformed to $Ax-b=0$.
+
+  $x_{k+1} = x_k + \alpha_k p_k$, solve for $\alpha$:
+  \begin{align*}
+    &\frac{\partial}{\partial \alpha} ((x_k + \alpha_k p_k)^T A (x_k + \alpha_k p_k) - b^T(x_k + \alpha_k p_k)) = 0\\
+    &\alpha_k = \frac{ -p_k^T r_k}{p_k^T A p_k}
+  \end{align*}
+  \subsection{Conjugate Direction}
+  Search directions linearly independent wrt. A.
+  \begin{align*}
+    (\forall i\not=j) p_i^T A p_j = 0
+  \end{align*}
+  Properties:
+  \begin{itemize}
+  \item Residual elimnated one direction at a time, resulting in max of n iterations.
+  \item Optimal if Hessian is diagonal, if not can try preconditioning.
+  \item Current residual is orthogonal to all previous search directions.
+  \item Any set of conjugate directions can be used (eg: eigenvectors, Gram-Schmidt)
+  \end{itemize}
+
+  \vfill\null
+  \columnbreak
+
+  Expanding subspace minimizer:\\
+  Using conjugate directions to generate sequence $\{x\}$, then:\\
+  $r_k^T p_i = 0, \forall i < k$, $x_k$ is minimizer of $\frac{1}{2} x^TAx - b^Tx$ over $\{ x | x= x_0 + span\{p_0,...p_{k-1}\}$
+  \begin{proof}
+    \begin{align*}
+      &\tilde{x} = x_0 + \sum_i \sigma_i p_i\\
+      &\tilde{x} \text{ minimizes over }\{x_0 + span\{ p_0, ... p_{k-1}\}\} \iff r(\tilde{x})^Tp_i = 0\\
+      &h(\sigma) = \phi(\tilde{x})\\
+      &\phi(x) =\frac{1}{2}x^TAx-b^Tx\\
+      &\text{h is also strictly convex quadratic,}\\
+      &\text{with unique }\sigma^*\text{ satisfying:}\\
+      &\frac{\partial h(\sigma^*)}{\partial \sigma_i} = 0, i=[0,k-1]\\
+      &\frac{\partial h(\sigma^*)}{\partial \sigma_i} = \nabla \phi(\tilde{x})^T p_i = 0, i = [0,k-1]\\
+      &\nabla \phi(x) = Ax-b=r\\
+      &r(\tilde{x})^T p_i = 0, i=[0,k-1]\\
+    \end{align*}  
+  \end{proof}
+  $p_i^T r_k=0, i=[0,k-1]$ via induction:
+  \begin{proof}
+    \begin{align*}
+      &\text{base case}: x_1 = x_0 + \alpha_0 p_0 \text{ minimizes } \phi \text{ along } p_0\\
+      &\implies r_1^T p_0 = 0\\
+      &\text{case: }r_{k-1}^T p_i = 0, i=[0,k-2]:\\
+      &r_k = r_{k-1} + \alpha_{k-1} A p_{k-1}\\
+      &p_{k-1}^T r_k = p_{k-1}^T r_{k-1} + \alpha_{k-1} p_{k-1}^T  A p_{k-1}=0(\text{by construction)}\\
+      &\text{A-conjugate} \implies p_{k-1}^T A p_{k-1}\\
+      &\text{case: }\forall i=[0,k-2]: p_i^T r_k=0\\
+      &p_i^T r_k = p_i^T r_{k-1} + \alpha_{k-1} p_i^T A p_{k-1}\\
+      &p_i^T r_{k-1} = 0 (by induction hypothesis\\
+      &\alpha_{k-1} p_i^T A p_{k-1} = 0 (conjugacy)\\
+      &p_i^T r_k = 0, i=[0,k-1]
+    \end{align*}
+  \end{proof}
+
+  \vfill\null
+  \pagebreak
+  
+  \subsection{Conjugate Gradient Method}
+  Idea:
+  \begin{itemize}
+  \item uses only previous search direction to compute current search direction
+  \item $p_k$ set to linear combination of $-r_k$ and $p_{k-1}$
+  \item impose $p_k^T A p_{k-1}=0$
+  \end{itemize}
+  \begin{align*}
+    p_k &= -r_k + \beta_k p_{k-1}\\
+    p_{k-1}^T A p_k &= -p_{k-1}^T A r_k + \beta p_{k-1}^T A p_{k-1}\\
+    0 &= -p_{k-1}^T A r_k + \beta p_{k-1}^T A p_{k-1}\\
+    \beta &= \frac{p_{k-1}^T A r_k}{p_{k-1}^T A p_{k-1}}\\
+    p_0& = -(Ax_0-b)=-r_0
+  \end{align*}
+  \begin{algorithm}[H]
+    $r_0 \leftarrow Ax_0-b$\\
+    $p_0 = -r_0$\\
+    \For{$k=[0,..n-1]$}{
+      \uIf{$r_k==0$}{
+        return $x_k$
+      }
+      \Else{
+        $\alpha_k \leftarrow \frac{-r_k^Tp_k}{p_x^T A p_k}$\\
+        $x_{k+1} \leftarrow x_k + \alpha_k p_k$\\
+        $r_{k+1} \leftarrow Ax_{k+1} - b$\\
+        $b_{k+1} \leftarrow \frac{p_k^T A r_{k+1}}{p_k^T A p_k}$\\
+        $p_{k+1} \leftarrow -r_{k+1} + \beta_{k+1} p_k$
+      }
+    }
+    \caption{Basic Conjugate Gradient Algorithm\label{Algo_CGBasic}}
+  \end{algorithm}
+  $p_$ and $r_k$ is within krylov subspace:\\
+  $K(r_0;k) =span\{r_0, Ar_0, ..A^k r_0\}$\\
+  if $r_k \not= 0$:\\
+  $r_k^T r_i = 0, i=[0,k-1]$\\
+  $span\{r_0,..,r_k\} = span\{r_0,Ar_0,..,A^k r_0\}$\\
+  $span\{p_0,..,p+k\}=span\{r_0,Ar_0,..,A^k r_0\}$\\
+  $p_k^T A p_i=0, i=[0,k-1]$\\
+  then, $\{x_k\} \rightarrow x^*$ in at most n steps.\\
+
+  \vfill\null
+  \columnbreak
+  
+  Simplification:
+  \begin{align*}
+    &p_{k+1} \leftarrow -r_{k+1} + \beta_{k+1} p_k\\
+    &\alpha_k \leftarrow \frac{-r_k^Tp_k}{p_k^T A p_k}\\
+    &\alpha_k \leftarrow \frac{-r_k^T(-r_{k} + \beta_{k} p_{k-1})}{p_k^T A p_k}\\
+    &(\forall i=[0,k-1]) r_k^T p_i=0 \implies \beta_k r_k^T p_{k-1}=0\\
+    &\alpha_k \leftarrow \frac{r_k^T r_k}{p_k^T A p_k}
+  \end{align*}
+  \begin{align*}
+    &r_{k+1}=r_k+\alpha_k A p_k\\
+    &A p_k = \frac{r_{k+1}-r_k}{\alpha_k}\\
+    &\beta = \frac{p_k^T A r_{k+1}}{p_k^T A p_k}\\
+    &p_k^T A p_k = p_k^T \frac{r_{k+1}-r_k}{\alpha_k}= \frac{-p_k^T r_k}{\alpha} (\text{conjugacy})\\
+    &p_k^T A p_k = -\frac{(- r_k + \beta_k p_{k-1})^T r_k}{\alpha}=\frac{r_k^T r_k}{\alpha} (\text{conjugacy})\\
+    &p_k^T A r_{k+1} = r_{k+1}^T A p_k\\
+    &p_k^T A r_{k+1} = r_{k+1}^T \frac{r_{k+1}-r_k}{\alpha_k}\\
+    &r_k \in span\{p_k,p_{k-1}\}\ and\ r_{k+1}^T p_i = 0, i=[0,k] \implies\\
+    &p_k^T A r_{k+1} = \frac{r_{k+1}^T r_{k+1}}{\alpha_k}\\
+    &\beta_{k+1} \leftarrow \frac{r_{k+1}^T r_{k+1}}{r_k^T r_k}
+  \end{align*}
+
+  \subsection{Nonlinear Method}
+  Minimize general convex function or nonlinear function. Variants: FR, PR.
+
+  \subsubsection{FR}
+  Modify linear CG by:
+  \begin{itemize}
+  \item replace residual by gradient of objective, $\nabla f_k$
+  \item replace $\alpha_k$ computation by a linear search to find approx. minimum along search direction
+  \end{itemize}
+
+  Equivalent to linear CG if objective is strongly convex quadratic.\\
+
+  Linear search for $\alpha_k$ with stong Wolfe condition to ensure $p_k$'s are descent directions wrt. objective function.\\
+  
+  \subsubsection{PR}
+  Replace $\beta_{k+1}$ computation in FR with:
+  \begin{align*}
+    \beta_{k+1} \leftarrow \frac{\nabla f_{k+1}^T (\nabla f_{k+1} - \nabla f_k)}{\nabla f_k^T \nabla f_k}
+  \end{align*}
   
 \end {document}

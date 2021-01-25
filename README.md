@@ -1,3 +1,3 @@
 # notes for numerical methods for optimization
 
-notes for the course that I audited
+notes for the audited course
