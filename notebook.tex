@@ -88,7 +88,8 @@
     B_{k+1}(x_{k+1}-x_k) & =\nabla f_{k+1} - \nabla f_k\\
     B_{k+1} s_k & = y_k\\
     s_k & = \alpha_k p_k\\
-    y_k & = \nabla f_{k+1} - \nabla f_k
+    y_k & = \nabla f_{k+1} - \nabla f_k\\
+    B_{k+1} &:= \text{approx. Hessian}
   \end{align*}
   \begin{align*}
     B_{k+1} & \succ 0\\
@@ -149,7 +150,7 @@
       $\rho_k \leftarrow \frac{1}{y_k^Ts_k}$\\
       $H_{k+1} \leftarrow (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T)\\
       + \rho_k s_k^T s_k$\\
-      $k \leftarrow k+1$
+      $k \leftarrow k+1$\\
     }
     \caption{BFGS Algorithm\label{Algo_BFGS}}
   \end{algorithm}
@@ -188,11 +189,11 @@
   \begin{align*}
     &\rho_k = \frac{f(x_k)-f(x_k+p_k)}{m_k(0)-m_k(p_k)}\\
     &action \leftarrow
-    \begin{cases}
-      \text{expand trust region} &, \rho_k \approx 1\ (agreement)\\
-      \text{shrink trust region} &, \rho_k  < 0 + \text{thresh}\\
-      \text{keep trust region} &, o/w
-    \end{cases}  
+      \begin{cases}
+        \text{expand trust region} &, \rho_k \approx 1\ (agreement)\\
+        \text{shrink trust region} &, \rho_k  < 0 + \text{thresh}\\
+        \text{keep trust region} &, o/w
+      \end{cases}  
   \end{align*}
 
   \begin{algorithm}[H]
@@ -297,15 +298,16 @@
   \subsection{linear method}
   Assuming unconstrained problem with strict convex quadratic objective function:
   \begin{align*}
-      \frac{1}{2} x^TAx-b^Tx, A \succ 0, A^T=A
+    \frac{1}{2} x^TAx-b^Tx, A \succ 0, A^T=A
   \end{align*}
   
   $\nabla(\frac{1}{2} x^TAx-b^Tx) = Ax-b$, thus $\min_x x^TAx - b^Tx$ transformed to $Ax-b=0$.
 
   $x_{k+1} = x_k + \alpha_k p_k$, solve for $\alpha$:
   \begin{align*}
-    &\frac{\partial}{\partial \alpha} ((x_k + \alpha_k p_k)^T A (x_k + \alpha_k p_k) - b^T(x_k + \alpha_k p_k)) = 0\\
-    &\alpha_k = \frac{ -p_k^T r_k}{p_k^T A p_k}
+    &\frac{\partial}{\partial \alpha} (\frac{1}{2}(x_k + \alpha_k p_k)^T A (x_k + \alpha_k p_k) - b^T(x_k + \alpha_k p_k)) = 0\\
+    &r_k = Ax-b\\
+    &\alpha_k = \frac{ -p_k^T r_k}{p_k^T A p_k}\\
   \end{align*}
   \subsection{Conjugate Direction}
   Search directions linearly independent wrt. A.
@@ -385,7 +387,7 @@
         $\alpha_k \leftarrow \frac{-r_k^Tp_k}{p_x^T A p_k}$\\
         $x_{k+1} \leftarrow x_k + \alpha_k p_k$\\
         $r_{k+1} \leftarrow Ax_{k+1} - b$\\
-        $b_{k+1} \leftarrow \frac{p_k^T A r_{k+1}}{p_k^T A p_k}$\\
+        $\beta_{k+1} \leftarrow \frac{p_k^T A r_{k+1}}{p_k^T A p_k}$\\
         $p_{k+1} \leftarrow -r_{k+1} + \beta_{k+1} p_k$
       }
     }
@@ -409,7 +411,7 @@
     &\alpha_k \leftarrow \frac{-r_k^Tp_k}{p_k^T A p_k}\\
     &\alpha_k \leftarrow \frac{-r_k^T(-r_{k} + \beta_{k} p_{k-1})}{p_k^T A p_k}\\
     &(\forall i=[0,k-1]) r_k^T p_i=0 \implies \beta_k r_k^T p_{k-1}=0\\
-    &\alpha_k \leftarrow \frac{r_k^T r_k}{p_k^T A p_k}
+    &\alpha_k \leftarrow \frac{r_k^T r_k}{p_k^T A p_k} \ \text{(simplified)}
   \end{align*}
   \begin{align*}
     &r_{k+1}=r_k+\alpha_k A p_k\\
@@ -421,22 +423,22 @@
     &p_k^T A r_{k+1} = r_{k+1}^T \frac{r_{k+1}-r_k}{\alpha_k}\\
     &r_k \in span\{p_k,p_{k-1}\}\ and\ r_{k+1}^T p_i = 0, i=[0,k] \implies\\
     &p_k^T A r_{k+1} = \frac{r_{k+1}^T r_{k+1}}{\alpha_k}\\
-    &\beta_{k+1} \leftarrow \frac{r_{k+1}^T r_{k+1}}{r_k^T r_k}
+    &\beta_{k+1} \leftarrow \frac{r_{k+1}^T r_{k+1}}{r_k^T r_k} \ \text{(simplified)}
   \end{align*}
 
   \subsection{Nonlinear Method}
   Minimize general convex function or nonlinear function. Variants: FR, PR.
 
-  \subsubsection{FR}
+  \subsubsection{FR (Fletcher Reaves)}
   Modify linear CG by:
   \begin{itemize}
-  \item replace residual by gradient of objective, $\nabla f_k$
+  \item replace residual by gradient of objective, $r_k \rightarrow \nabla f_k$
   \item replace $\alpha_k$ computation by a linear search to find approx. minimum along search direction
   \end{itemize}
 
   Equivalent to linear CG if objective is strongly convex quadratic.\\
 
-  Linear search for $\alpha_k$ with stong Wolfe condition to ensure $p_k$'s are descent directions wrt. objective function.\\
+  Linear search for $\alpha_k$ with strong Wolfe condition to ensure $p_k$'s are descent directions wrt. objective function.\\
   
   \subsubsection{PR}
   Replace $\beta_{k+1}$ computation in FR with:
@@ -444,4 +446,172 @@
     \beta_{k+1} \leftarrow \frac{\nabla f_{k+1}^T (\nabla f_{k+1} - \nabla f_k)}{\nabla f_k^T \nabla f_k}
   \end{align*}
   
+  \vfill\null
+  \columnbreak
+  
+  \section{Proximal Algorithm}
+  Idea:
+  \begin{itemize}
+  \item reliance on easy to evaluate proximal operators
+  \item separability allows parallel evaluation
+  \item generalization of projection based algorithms
+  \end{itemize}
+
+  \begin{align*}
+    prox_{\lambda f}(v) = \argminl_{x} f(x) + \frac{1}{2 \lambda} \|x-v\|_2^2
+  \end{align*}
+
+  \subsection{Proximal Gradient Method}  
+  Solve $\min_{x} g(x)+f(x)$, where $f,g$ are closed, convex functions and $f$ differentiable
+  \begin{align*}
+    &x^* = prox_{\lambda^k g}(x^k-\lambda^k \nabla f(x^k)) \\
+    &=\argminl_{x} g(x) + \frac{1}{2 \lambda^k} \|x - (x^k - \lambda^k \nabla f(x^k))\|_2^2\\
+    &\text{tradeoff between g and and gradient step}\\
+    &g=I_C(x) \implies \text{projected gradient step}\\
+    &g=0 \implies \text{gradient descent}\\
+    &f=0 \implies \text{proximal minimization}
+  \end{align*}
+
+  Relation to Pixed Point:\\
+  $x^*$ is a fixed point solution of $\min_{x} g(x)+f(x)$ iff $0 \in \nabla f(x^*) + \partial g(x^*)$ iff $x^* = (I+\lambda \partial g)^{-1}(I-\lambda \nabla f)(x^*)$\\
+  
+  Forward Euler, Backward Euler stepping is same as the proximal gradient iteration, $prox_{\lambda^k g}(x^k-\lambda^k \nabla f(x^k))$\\
+
+  \subsection{Accelerated Proximal Gradient Method}
+  Introduce extrapolation:
+  \begin{align*}
+    &y^{k+1} = x^k + w^k(x^k-x^{k-1})\\
+    &x^{k+1} = prox_{\lambda^k g}(y^{k+1}-\lambda^k \nabla f(y^{k+1}))\\
+    &w^k \in [0,1)
+  \end{align*}
+
+  Example: $w^k = \frac{k}{k+3}, w^0 = 0, \lambda^k \in (0,1/L], L:= \text{Lipschitz constant of }\nabla f,\ or\ \lambda^k$ found via line search.
+  Line search for $\lambda^k$ (Beck and Teboulle):
+
+  \begin{algorithm}[H]
+    $\hat{f}(x,y):=f(y) + \nabla f(y)^T(x-y) + \frac{1}{2\lambda}\|x-y\|^2_2$\\
+    \While{True}{
+      $z = prox_{\lambda g}(y^k-\lambda \nabla f(y^k))$\\
+      \uIf{$f(x) \leq \hat{f}(z,y^k)$}{
+        break
+      }
+      $\lambda = \beta \lambda$
+    }
+    return $\lambda^k := \lambda, x^{k+1} := z$\\
+    \caption{Proximal Gradient Algorithm\label{Algo_ProximalGradient}}
+  \end{algorithm}
+
+  \subsection{Types of Proximal Operators}
+  \begin{itemize}
+  \item quadratic functions
+    \begin{align*}
+      f&=\frac{1}{2} \|.\|_x^2 \implies prox_{\lambda f}(v) = (\frac{1}{1+\lambda})v\\
+      f&=\frac{1}{2}x^T A x + b^T x + c, A \in S_+^n \implies\\
+      &prox_{\lambda f}(v)=(I+\lambda)^{-1}(v-\lambda b)
+    \end{align*}
+  \item unconstrained problem: use gradient methods such as Newton, Quasi-Newton
+  \item constrained: use projected subgradient for non-smooth, projected gradient or interior method for smooth
+  \item separable function: if scalar, may be solved analytically, eg:
+    L1 norm separable to:
+    \begin{align*}
+      f(x) = |x| \implies prox_{\lambda f}(v) =
+      \begin{cases}
+        v-\lambda ,& v \geq \lambda\\
+        0,& |v| \leq \lambda\\
+        v+\lambda, & v \leq -\lambda
+      \end{cases}
+    \end{align*}
+    \begin{align*}
+      f(x) = -log(x) \implies prox_{\lambda f}(v) = \frac{v+\sqrt{v^2+4\lambda}}{2}
+    \end{align*}
+  \item general scalar function
+    \begin{itemize}
+    \item localization: using a subgradient oracle and bisection algorithm
+    \item twice continuously differentiable: guarded Newton method
+    \end{itemize}
+  \item polyhedra constraint, quadratic objective: solve as QP problem
+    \begin{itemize}
+    \item duality to reduce number of variables to solve if possible
+    \item gram matrix caching
+    \item affine constraint($Ax=b$): use pseudo-inverse, $A^{+}$:
+      \begin{align*}
+        \Pi_C(v) &= v - A^{+}(Av-b)\\
+                 &A \in R^{m \times n}, m < n \implies A^{+} = A^T(AA^T)^{-1}\\
+                 &A \in R^{m \times n}, m > n \implies A^{+} = (A^TA)^{-1}A^T
+      \end{align*}
+    \item hyperplane constaint($a^Tx=b$):
+      \begin{align*}
+        \Pi_C(v) = v + (\frac{b-a^Tb}{\|a\|_2^2})a
+      \end{align*}
+    \item halfspace
+      \begin{align*}
+        \Pi_C(v) = v - \frac{max(a^T v -b,0)}{\|a\|_2^2}a
+      \end{align*}
+    \item box($l\leq x \leq u$)
+      \begin{align*}
+        \Pi_C(v)_k = min(max(v_k, l_k), u_k)
+      \end{align*}
+    \item probability simplex($1^Tx= 1, x \geq 0$)\\
+      bisection algo on $\nu$:
+      \begin{align*}
+        \Pi_C(v) = (v- \nu 1)_+\\
+        \text{intial }[l_k,u_k] = [\max_i v_i-1, \max_i vi]
+      \end{align*}
+      analytically solve when bounded in between 2 adjacent v_i's      
+    \end{itemize}
+  \item cones ($\kappa$: proper cone)\\
+    problem of the form:
+    \begin{align*}
+      min_x \|x-v\|_2^2\\
+      s.t.: x\in \kappa
+    \end{align*}
+    \begin{align*}
+      x \in \kappa\\
+      v=x-\lambda\\
+      \lambda\in\kappa^*\\
+      \lambda^Tx=0
+    \end{align*}
+    \begin{itemize}
+    \item cone $C=\R_+^n$
+      \begin{align*}
+        \Pi_C(v)=v_+
+      \end{align*}
+    \item 2nd order cone $C=\{(x,t)\in \R^{n+1}: \|x\|_2 \leq t\}$
+      \begin{align*}
+        \Pi_C(v,s) = \begin{cases}
+          0,& \|v\|_2 \leq -s\\
+          (v,s),& \|v\|_2 \leq s\\
+          \frac{1}{2}(1+\frac{s}{\|v\|_2})(v,\|v\|_2),& \|v\|_2 \geq |s|
+        \end{cases}
+      \end{align*}
+    \item PSD cone $S_+^n$
+      \begin{align*}
+        \Pi_C(V)&=\sum_i (\lambda_i)_+ u_i u_i^T\\
+        V&=\sum_i \lambda_i u_i u_i^T\ (eigendecomp)
+      \end{align*}
+    \item exponential cone\\
+      Todo
+    \end{itemize}
+  \item pointwise supremum
+    \begin{itemize}
+    \item max function
+    \item support function
+    \end{itemize}
+  \item norms
+    \begin{itemize}
+    \item L2
+    \item L1
+    \item L-$\inf$
+    \item elastic net
+    \item sum of norms
+    \item matrix norm
+    \end{itemize}
+  \item sublevel set
+  \item epigraph
+  \item matrix functions
+    Todo
+  \end{itemize}
+
+  \section{Subgradient Method}
+  todo
 \end {document}
