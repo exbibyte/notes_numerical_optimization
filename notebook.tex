@@ -68,20 +68,33 @@
 
   \section{General}
 
-  line search conditions:
+  line search conditions (1st and 2nd order):
   \begin{align}
-    f_{k+1}^T & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k, c_1,\alpha_k \in (0,1)\\
-    \nabla f_{k+1}^T p_k & \geq c_2 \nabla f_k^T p_k, 0<c_1<c_2<1\\
-    \text{where}:&\\
-    f_{k} & = f(x_k)\\
-    f_{k+1} & = f(x_k+\alpha_k p_k)
+    f_{k+1}^T & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k\\
+    \nabla f_{k+1}^T p_k & \geq c_2 \nabla f_k^T p_k\\
+              &c_1,\alpha_k \in (0,1)\\
+              &0<c_1<c_2<1\\
+    \text{where}:& f_{k} = f(x_k)\\
+              & f_{k+1} = f(x_k+\alpha_k p_k)
   \end{align}
+
+  \begin{algorithm}[H]
+    \SetKwInOut{Input}{$f, x, d, c_1, \alpha, \beta$}\SetKwInOut{Output}{$\alpha$}
+    \Input{function, x, direction, gradient threshold, initial step length, contraction}
+    \Output{step length}
+    \While{$f(x + \alpha d) > f(x) + c_1 \alpha \nabla f(x)^T d$}{
+      $\alpha \leftarrow \alpha * \beta$\\
+    }
+    return $\alpha$
+    \caption{Line Search\label{Algo_LineSearch}}
+  \end{algorithm}
+  
   % Todo: add section on derivatives
 
   \section{Quasi Newton}
 
   \subsection{BFGS}
-  properties: $O(n^2)$, self correcting, slightly more iterations than Newton Method, linear convergence order and superlinear rate of convergence\\
+  properties: $O(n^2)$, self correcting, slightly more iterations than Newton Method, linear convergence order and superlinear rate of convergence
   
   secant equation:
   \begin{align*}
@@ -142,16 +155,18 @@
     \Input{inverse Hessian approx., initial point, convergence tolerance}
     \Output{solution}
     $k \leftarrow$ 0\\
+    $p_k \leftarrow -B^{-1} \nabla f(x_k) = -H\nabla f(x_k)$\\
     \While{$||\nabla f_k|| > \epsilon$}{
       $\alpha_k \leftarrow $ LineSearch(..)\\
       $x_{k+1} \leftarrow x_k + \alpha_k p_k$\\
-      $s_k \leftarrow x_{x+1} - x_k$\\
+      $s_k \leftarrow x_{k+1} - x_k$\\
       $y_k \leftarrow \nabla f_{k+1} - \nabla f_k$\\
       $\rho_k \leftarrow \frac{1}{y_k^Ts_k}$\\
       $H_{k+1} \leftarrow (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T)\\
-      + \rho_k s_k^T s_k$\\
+      + \rho_k s_k s_k^T$\\
       $k \leftarrow k+1$\\
     }
+    return $x$
     \caption{BFGS Algorithm\label{Algo_BFGS}}
   \end{algorithm}
   
@@ -164,7 +179,7 @@
   inaccurate line search can be used to reduce computation cost
   \vfill\null
   
-  \pagebreak
+  % \pagebreak
   
   \section{Trust Region Methods}
   idea:
@@ -268,7 +283,7 @@
   \end{cases}$
   
   \vfill\null
-  \pagebreak
+  % \pagebreak
 
   \subsection{Iterative Solution}
   Idea: solve subproblem $\min_{\|p\| \leq \Delta} m(p)$ by applying Newton's method to find $\lambda$ that matches trust region radius. This is slightly more accurate per step compared to Dogleg. Use $(B+\lambda I)p^*=-g$ to solve $\min_{\|p\| \leq \Delta} m(p)$ for $\lambda$.
@@ -461,7 +476,13 @@
     prox_{\lambda f}(v) = \argminl_{x} f(x) + \frac{1}{2 \lambda} \|x-v\|_2^2
   \end{align*}
 
-  \subsection{Proximal Gradient Method}  
+  Resolvent of subdifferential operator:
+  \begin{align*}
+    &z=prox_{\lambda f}(x) \implies z \in (I+\lambda \partial f)^{-1}(x)\\
+    &(I+\lambda \partial f)^{-1} :=\text{resolvent of operator }\partial f
+  \end{align*}
+  
+  \subsection{Proximal Gradient Method}
   Solve $\min_{x} g(x)+f(x)$, where $f,g$ are closed, convex functions and $f$ differentiable
   \begin{align*}
     &x^* = prox_{\lambda^k g}(x^k-\lambda^k \nabla f(x^k)) \\
