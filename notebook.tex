@@ -68,20 +68,53 @@
 
   \section{General}
 
-  line search conditions (1st and 2nd order):
+  line search conditions (1st and 2nd order), how to choose step length and direction:\\
+  
+  sufficient decrease, proportional to $\alpha_k$ step length and directional derivative $\nabla f_k^T p_k$:
   \begin{align}
     f_{k+1}^T & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k\\
+    \nabla f_k^T p_k & \leq 0\ //by\ construction
+  \end{align}
+  curvature:
+  \begin{align}
     \nabla f_{k+1}^T p_k & \geq c_2 \nabla f_k^T p_k\\
+    \frac{\partial \phi(\alpha_k)}{\partial \alpha_k} & \geq \frac{\partial \phi(0)}{\partial \alpha_k}\\
               &c_1,\alpha_k \in (0,1)\\
-              &0<c_1<c_2<1\\
-    \text{where}:& f_{k} = f(x_k)\\
-              & f_{k+1} = f(x_k+\alpha_k p_k)
+    &0<c_1<c_2<1
+  \end{align}
+  \begin{align*}
+  \text{where}:& f_{k} = f(x_k)\\
+  & f_{k+1} = f(x_k+\alpha_k p_k)\\
+  & \phi(\alpha_k) = f(x_k + \alpha_k p_k)\\
+  & \frac{\partial \phi(\alpha_k)}{\partial \alpha_k} = \nabla f_{k+1}^T p_k\\
+  & \frac{\partial \phi(0)}{\partial \alpha_k} = \nabla f_{k}^T p_k //initial\ slope
+  \end{align*}
+
+  strong Wolfe curvature condition, to restrict large positive derivative:
+  \begin{align}
+    | \nabla f_{k+1}^T p_k| \leq c_2 |\nabla f_k^T p_k|
+  \end{align}
+  
+  Form of search direction:
+  \begin{align}
+    p_k = - B_k^{-1} \nabla f_k
+  \end{align}
+  
+  $B_k$ symmetric, non-singular, postive definite $\implies$ $p_k$ is a descent direction:
+  \begin{align}
+    \nabla f_k^T(-B_k^{-1} \nabla f_k) < 0
   \end{align}
 
+  Goldstein condition (may miss minimizer of $f$):
+  \begin{align}
+    &f_k+(1-c) \alpha_k \nabla f_k^T p_k \leq f_{k+1} \leq f_k + c \alpha \nabla f_k^T p_k\\
+    &c \in (0,\frac{1}{2})
+  \end{align}
+  
   \begin{algorithm}[H]
     \SetKwInOut{Input}{$f, x, d, c_1, \alpha, \beta$}\SetKwInOut{Output}{$\alpha$}
     \Input{function, x, direction, gradient threshold, initial step length, contraction}
-    \Output{step length}
+    \Output{found step length}
     \While{$f(x + \alpha d) > f(x) + c_1 \alpha \nabla f(x)^T d$}{
       $\alpha \leftarrow \alpha * \beta$\\
     }
@@ -162,8 +195,7 @@
       $s_k \leftarrow x_{k+1} - x_k$\\
       $y_k \leftarrow \nabla f_{k+1} - \nabla f_k$\\
       $\rho_k \leftarrow \frac{1}{y_k^Ts_k}$\\
-      $H_{k+1} \leftarrow (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T)\\
-      + \rho_k s_k s_k^T$\\
+      $H_{k+1} \leftarrow (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T) + \rho_k s_k s_k^T$\\
       $k \leftarrow k+1$\\
     }
     return $x$
@@ -195,7 +227,8 @@
   \begin{align*}
     \min_{p \in \R^n} m_k(p) & = f_k + g_k^Tp + \frac{1}{2}p^TB_kp,\ st.\ ||p||\leq \Delta_k\\
     \Delta_k & :=\text{trust region radiius}\\
-    g_k & =\nabla f(x_k)
+    g_k & =\nabla f(x_k)\\
+    B_k & \succeq 0
   \end{align*}
   
   full step is ($p_k=-B_k^{-1}g_k)$ taken when $B\succ 0 $ and $||B_k^{-1} g_k|| \leq \Delta_k$
@@ -216,17 +249,19 @@
     \While{$||\nabla f_k|| > \epsilon$}{
       $p_k \leftarrow
       \argminl_{p} f_k + g_k^Tp + \frac{1}{2}p^TB_kp,\ st.\ ||p||\leq \Delta_k$\\
-      $\rho_k = \frac{f(x_k)-f(x_k+p_k)}{m_k(0)-m_k(p_k)}$\\
+      $\rho_k = \frac{f(x_k)-f(x_k+p_k)}{m_k(0)-m_k(p_k)} //ratio test$\\
+      //change trust region for next iterate\\
       \uIf{$\rho_k<\gamma (:\frac{1}{4})$}{
-        $\Delta_{k+1} \leftarrow \alpha (:\frac{1}{4}) \Delta_k$
+        $\Delta_{k+1} \leftarrow \alpha (:\frac{1}{4}) \Delta_k //shrink$
       }
       \uElseIf{$\rho_k> \beta (:\frac{3}{4})\ and\ ||p_k|| == \Delta_k$}{
-        $\Delta_{k+1} \leftarrow min(2 \Delta_k, \hat{\Delta})$
+        $\Delta_{k+1} \leftarrow min(2 \Delta_k, \hat{\Delta}) //expand$
       }
       \Else{
-        $\Delta_{k+1} \leftarrow \Delta_k$
+        $\Delta_{k+1} \leftarrow \Delta_k //keep$
       }
-      
+
+      //accept/reject for current iterate\\
       \uIf{$\rho_k > \eta (: \in [0, \frac{1}{4}))$}{
         $x_{k+1} \leftarrow x_k + p_k$
       }
@@ -237,21 +272,28 @@
     \caption{Trust Region Algorithm\label{Algo_TrustRegion}}
   \end{algorithm}
 
-  minimizer of the 2nd order Taylor series satisfy the following:
+  Minimizer of the 2nd order Taylor series satisfy the following as a global solution for trust region iff:
   \begin{align*}
     (B+\lambda I)p^*=-g\\
+    \text{complementary slackness:}\\
     \lambda(\Delta - ||p^*||)=0\\
-    (B+\lambda I) \succeq 0
+    (B+\lambda I) \succeq 0\\
+    \lambda \geq 0
+  \end{align*}
+
+  \begin{align*}
+    \lambda \ge 0 \implies p \text{ parallel to negative gradient of model}
   \end{align*}
   
-  solving 2nd order Taylor series using approx methods:
+  Solving 2nd order Taylor series using approx methods:
   \begin{itemize}
   \item dogleg
   \item 2-D subspace minimization
-  \item conjugate gradient based
+  \item conjugate gradient based, effective when $B$ large, sparse
   \end{itemize}
-
-  Cauchy Point:\\
+  These reduce at least as much as Cauchy Point.\\
+  
+  Cauchy Point (sufficient reduction in model value):\\
   Use 1st order approx. of model and gradient descent to get get next iterate, bounded within trust region.\\
   
   \subsection{Dogleg method}
@@ -259,15 +301,18 @@
   $p^B=-B^{-1}g$\\
   $p^*=p^B$ if $\Delta \geq \|p^B\|$\\
   $p^U=\frac{-g^Tg}{g^TBg}g$ (intermediate point along direction of steepest descent)\\
-  interpolate between $p^U$ and $p^B$:\\
+  Resulting algo, interpolate between $p^U$ and $p^B$:\\
   $\tilde{p}(\tau) =
   \begin{cases}
     \tau p^U &, \tau_\in [0,1]\\
     p^U + (\tau-1)(p^B-p^U) &, \tau \in [1,2]
   \end{cases}
-  $\\
-  $B \succ 0 \implies$ $\|\tilde{p}(\tau)\|$ increases wrt. $\tau$, $m(\tilde{p}(\tau))$ decreases wrt. $\tau$\\
-
+  $
+  \begin{align*}
+    B \succ 0 \implies & \|\tilde{p}(\tau)\| \text{increases wrt. }\tau\ \land\\
+    & m(\tilde{p}(\tau)) \text{decreases wrt. } \tau
+  \end{align*}
+  
   if $\|p^B\| \leq \Delta$: $p$ chosen at $p^B$\\
   else $p$ chosen at intersection of $\tilde{p}(\tau)$ and trust region boudnary by solving:\\
   $\|p^U+(\tau-1)(p^B-p^U)\|^2 = \|\Delta^2\|$
@@ -276,10 +321,10 @@
   $\tau_k = \argminl_{\tau\geq0} m_k(\tau p_k^S), \|\tau p_k^S\| \leq \Delta_k$\\
   $p_k^S=\frac{-\Delta_k g_k|}{\|g_k\|}$\\
   $p_k^C=\tau_k p_k^S$\\
-  $p_k^C=-\tau_k \frac{\Deltak g_k}{\|g_k\|}$\\
+  $p_k^C=-\tau_k \frac{\Delta_k g_k}{\|g_k\|}$\\
   $\tau_k=\begin{cases}
     1 &, g_k^T B_k g_k \leq 0\\
-    min(\frac{\|g_k|\^3}{\Delta_k g_k^T B_k g_k}, 1) &, o/w
+    min(\frac{\|g_k|^3}{\Delta_k g_k^T B_k g_k}, 1) &, o/w
   \end{cases}$
   
   \vfill\null
@@ -288,8 +333,8 @@
   \subsection{Iterative Solution}
   Idea: solve subproblem $\min_{\|p\| \leq \Delta} m(p)$ by applying Newton's method to find $\lambda$ that matches trust region radius. This is slightly more accurate per step compared to Dogleg. Use $(B+\lambda I)p^*=-g$ to solve $\min_{\|p\| \leq \Delta} m(p)$ for $\lambda$.
 
-  If $lambda=0$ and $(B+\lambda I)p^*=-g, \|p^*\| \leq \Delta$ and $(B+\lambda I) \succeq 0$: return $\lambda$\\
-  Else: find $\lambda$ s.t. $(B+\labda I) \succeq 0$ and $\|p(\lambda)\| = \Delta, p(\lambda)=-(B+\lambda I)^{-1}g$. Solve and return $\lambda$.
+  If $\lambda=0$ and $(B+\lambda I)p^*=-g, \|p^*\| \leq \Delta$ and $(B+\lambda I) \succeq 0$: return $\lambda$\\
+  Else: find $\lambda$ s.t. $(B+\lambda I) \succeq 0$ and $\|p(\lambda)\| = \Delta, p(\lambda)=-(B+\lambda I)^{-1}g$. Solve and return $\lambda$.
   
   Solve $\|p(\lambda)\|-\Delta=0, \lambda > \lambda_1$ via Newton's method (root finding). Approx. this to nearly a linear problem for easy solving:\\
 
@@ -399,16 +444,16 @@
         return $x_k$
       }
       \Else{
-        $\alpha_k \leftarrow \frac{-r_k^Tp_k}{p_x^T A p_k}$\\
+        $\alpha_k \leftarrow \frac{-r_k^Tp_k}{p_k^T A p_k} = \frac{r_k^T r_k}{p_k^T A p_k}$\\
         $x_{k+1} \leftarrow x_k + \alpha_k p_k$\\
         $r_{k+1} \leftarrow Ax_{k+1} - b$\\
-        $\beta_{k+1} \leftarrow \frac{p_k^T A r_{k+1}}{p_k^T A p_k}$\\
+        $\beta_{k+1} \leftarrow \frac{p_k^T A r_{k+1}}{p_k^T A p_k}=\frac{r_{k+1}^T r_{k+1}}{r_k^T r_k}$\\
         $p_{k+1} \leftarrow -r_{k+1} + \beta_{k+1} p_k$
       }
     }
     \caption{Basic Conjugate Gradient Algorithm\label{Algo_CGBasic}}
   \end{algorithm}
-  $p_$ and $r_k$ is within krylov subspace:\\
+  $p_k$ and $r_k$ is within krylov subspace:\\
   $K(r_0;k) =span\{r_0, Ar_0, ..A^k r_0\}$\\
   if $r_k \not= 0$:\\
   $r_k^T r_i = 0, i=[0,k-1]$\\
@@ -447,8 +492,8 @@
   \subsubsection{FR (Fletcher Reaves)}
   Modify linear CG by:
   \begin{itemize}
-  \item replace residual by gradient of objective, $r_k \rightarrow \nabla f_k$
-  \item replace $\alpha_k$ computation by a linear search to find approx. minimum along search direction
+  \item replace residual by gradient of nonlinear objective, $r_k \rightarrow \nabla f_k$
+  \item replace $\alpha_k$ computation by a linear search to find approx. minimum along search direction of $f$
   \end{itemize}
 
   Equivalent to linear CG if objective is strongly convex quadratic.\\
@@ -458,7 +503,8 @@
   \subsubsection{PR}
   Replace $\beta_{k+1}$ computation in FR with:
   \begin{align*}
-    \beta_{k+1} \leftarrow \frac{\nabla f_{k+1}^T (\nabla f_{k+1} - \nabla f_k)}{\nabla f_k^T \nabla f_k}
+    \beta_{k+1}^{PR} & \leftarrow \frac{\nabla f_{k+1}^T (\nabla f_{k+1} - \nabla f_k)}{\nabla f_k^T \nabla f_k}\\
+    \beta_{k+1}^+ & \leftarrow \max(\beta_{k+1}^{PR}, 0)
   \end{align*}
   
   \vfill\null
@@ -635,4 +681,6 @@
 
   \section{Subgradient Method}
   todo
+
+  \end{multicols*}
 \end {document}
