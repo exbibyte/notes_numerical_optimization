@@ -471,17 +471,24 @@
   \begin{align*}
     \frac{1}{2} x^TAx-b^Tx, A \succ 0, A^T=A
   \end{align*}
-  
+
+
   $\nabla(\frac{1}{2} x^TAx-b^Tx) = Ax-b$, thus $\min_x x^TAx - b^Tx$ transformed to $Ax-b=0$.
 
-  $x_{k+1} = x_k + \alpha_k p_k$, solve for $\alpha$:
+  let $x_{k+1} = x_k + \alpha_k p_k$, solve for $\alpha$:
   \begin{align*}
-    &\frac{\partial}{\partial \alpha} (\frac{1}{2}(x_k + \alpha_k p_k)^T A (x_k + \alpha_k p_k) - b^T(x_k + \alpha_k p_k)) = 0\\
+    %%     &\frac{\partial}{\partial \alpha} (\frac{1}{2}(x_k + \alpha_k p_k)^T A (x_k + \alpha_k p_k) - b^T(x_k + \alpha_k p_k)) = 0\\
+    &Ax_{k+1}-b=0\\
+    &A(x_k+\alpha_k p_k) - b=0\\
+    &\alpha_k A p_k = b - Ax_k\\
     &r_k = Ax-b\\
-    &\alpha_k = \frac{ -p_k^T r_k}{p_k^T A p_k}\\
+    &\alpha_k A p_k = -r_k\\
+    &\alpha_k p_k^T A p_k = - p_k^T r_k\\
+    &\alpha_k = - \frac{p_k^T r_k}{p_k^T A p_k}
   \end{align*}
   \subsection{Conjugate Direction}
-  Search directions linearly independent wrt. A.
+  
+  Enforce by construction for search directions linearly independent wrt. A.:
   \begin{align*}
     (\forall i\not=j) p_i^T A p_j = 0
   \end{align*}
@@ -495,8 +502,35 @@
 
   \vfill\null
   \columnbreak
-
-  Expanding subspace minimizer:\\
+    
+  \subsubsection{Termination Steps}
+  Theorem [T5.1] Conjugate direction algorithm converges to solution $x \in \R^n$ of linear system in n steps.
+  \begin{proof}
+    \begin{align*}
+      &\text{given:}\\
+      &x_{k+1} = x_k + \alpha_k p_k\\
+      &\alpha_k = - \frac{r_k^T p_k}{p_k^T A p_k}\\
+      &(\forall i \neq j) p_i^T A p_j = 0\ \text{[A conjugate]}\\
+      &\text{then:}\\
+      &x^*-x_0 = \sum_{i=0}^{n-1} \sigma_i p_i\\
+      &p_k^T A(x^*-x_0) = p_k^T A(\sum_{i=0}^{n-1} \sigma_i p_i)\\
+      &\sigma_i = \frac{p_k^T A(x^*-x_0)}{p_k^T A p_k}\ \text{(from conjugacy)}\\
+      &x_k = x_0 + \sum_{i=0}^{k-1} \alpha_i p_i\\
+      &p_k^T A x_k = p_k^T A (x_0+\alpha_0 p_0 + ..)\\
+      &p_k^T A x_k = p_k^T A x_0\ \text{(from conjugacy)}\\
+      &p_k^T A (x_k-x_0) = 0\\
+      &p_k^T A(x^*-x_0) = p_k^T A(x^*-x_k)\\
+      &p_k^T A(x^*-x_0) = p_k^T(b-Ax_k) = -p_k^T r_k\\
+      &\sigma_i = \frac{-p_k^T r_k}{p_k^T A p_k} = \alpha_k\\
+      &\alpha_k\ \text{is 1D minimizer of kth coordinate by construction}
+    \end{align*}
+    Conjugate direction algo. terminates in n steps.
+  \end{proof}
+  
+  \vfill\null
+  \columnbreak
+  
+  \subsubsection{Expanding subspace minimizer}
   Using conjugate directions to generate sequence $\{x\}$, then:\\
   $r_k^T p_i = 0, \forall i < k$, $x_k$ is minimizer of $\frac{1}{2} x^TAx - b^Tx$ over $\{ x | x= x_0 + span\{p_0,...p_{k-1}\}$
   \begin{proof}
@@ -524,7 +558,7 @@
       &\text{A-conjugate} \implies p_{k-1}^T A p_{k-1}\\
       &\text{case: }\forall i=[0,k-2]: p_i^T r_k=0\\
       &p_i^T r_k = p_i^T r_{k-1} + \alpha_{k-1} p_i^T A p_{k-1}\\
-      &p_i^T r_{k-1} = 0 (by induction hypothesis\\
+      &p_i^T r_{k-1} = 0 (\text{by induction hypothesis})\\
       &\alpha_{k-1} p_i^T A p_{k-1} = 0 (conjugacy)\\
       &p_i^T r_k = 0, i=[0,k-1]
     \end{align*}
