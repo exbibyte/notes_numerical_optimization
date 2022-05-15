@@ -126,62 +126,168 @@
 
   \section{Quasi Newton}
 
-  \subsection{BFGS}
+  \subsection{Concept}
   properties: $O(n^2)$, self correcting, slightly more iterations than Newton Method, linear convergence order and superlinear rate of convergence
-  
-  secant equation:
-  \begin{align*}
-    B_{k+1}(x_{k+1}-x_k) & =\nabla f_{k+1} - \nabla f_k\\
-    B_{k+1} s_k & = y_k\\
-    s_k & = \alpha_k p_k\\
-    y_k & = \nabla f_{k+1} - \nabla f_k\\
-    B_{k+1} &:= \text{approx. Hessian}
+
+  Derivation, using 2nd order model, with $B_k$ SPSD:
+  \begin{align*}  
+    m_k(p)=f_k + \nabla f_k^T p + \frac{1}{2} p^T B_k p
   \end{align*}
+  taking gradient wrt. $p$ and solve, assuming minimum exists:
+  \begin{align*}  
+    0 & = \nabla f_k + B_k p\\
+    p & = - B_k^{-1} \nabla f_k
+  \end{align*}
+  update equation:
   \begin{align*}
-    B_{k+1} & \succ 0\\
-    s_k^T B_{k+1} s_k & = s^T y_k > 0\\
-  \end{align*}    
+    x_{k+1} & = x_k + \alpha_k p_k\\
+    x_{k+1} & = x_k - \alpha_k B_k^{-1} \nabla f_k
+  \end{align*}
+  pick $\alpha$ to satisfy Wolfe conditions
+
+  updated model at next iterate $x_{k+1}$:
+  \begin{align*}
+    m_{k+1}(p)=f_{k+1} + \nabla f_{k+1}^T p + \frac{1}{2} p^T B_{k+1} p
+  \end{align*}
+  impose reasonable conditions:
+  \begin{enumerate}
+  \item gradient of $m_{k+1}$ matches gradient of objective function $f$ at iterate $x_k$
+  \item gradient of $m_{k+1}$ matches gradient of objective function $f$ at iterate $x_{k+1}$
+  \end{enumerate}
+  \begin{align*}
+    \nabla m_{k+1}(0) & = \nabla f_{k+1} \\
+    & \implies m_{k+1} \text{ condition 1 satisfied}
+  \end{align*}
+
+  condition 2 (gradient of $m_{k+1}$ match gradient of objective $f$ at iterate $x_k$):
+  \begin{align*}
+    \nabla m_{k+1}(-\alpha_k p_k) &= \nabla f_{k+1} - \alpha_k B_{k+1} p_k = \nabla f_k\\
+    \nabla f_{k+1} - \nabla f_k &= \alpha_k B_{k+1} p_k\\
+    y_k &= \nabla f_{k+1} - \nabla f_k\\
+    s_k &= x_{k+1} - x_k = \alpha_k p_k\\
+    y_k &= B_{k+1} s_k \text{ [secant equation]}
+  \end{align*}
+
+  $B_{k+1}$ SPD $\implies s_k^T B_{k+1} s_k = s_k^T y_k > 0$\\
+  $f$ strongly convex $\implies s_k^T y_k > 0$ satisfied for any 2 points $x_k$ and $x_{k+1}$.\\
+  $f$ nonconvex $\implies$ need to enforce $s_k^T y_k$ by Wolfe conditions, and use line search for step length $\alpha$.
+  
+  Using line search ensures curvature condition:
   \begin{proof}
     \begin{align*}
-      y_k^T s_k & = (\nabla f_{k+1} - \nabla f_k)^T s_k\\
-      \nabla f_{k+1}^T s_k & \geq c_2 \nabla f_k^T s_k\\
-      (\nabla f_{k+1} - \nabla f_k)^T s_k & \geq c_2 \nabla f_k^T s_k - \nabla f_k^T s_k\\
-      y_k^T s_k & \geq (c_2-1) \nabla f_k^T s_k\\
-      c_2 < 1, s_k \text{ is a descent dir}& \implies s_k^T y_k > 0
+      &s_k=x_{k+1} - x_k = \alpha_k p_k\\
+      &y_K = \nabla f_{k+1} - \nabla f_k\\
+      &\text{Wolfe curvature condition:}\\
+      &\nabla f_{k+1}^T p_k \geq c_2 \nabla f_k^T p_k, c_2 \in (0,1)\\
+      &y_k^T s_k = (\nabla f_{k+1} - \nabla f_k)^T (\alpha_k p_k)\\
+      &y_k^T s_k = \alpha_k (\nabla f_{k+1} - \nabla f_k)^T p^k\\
+      &y_k^T s_k = \alpha_k (c_2 \nabla f_k - \nabla f_k)^T p^k\\
+      &y_k^T s_k = \alpha_k (c_2-1) \nabla f_k^T p^k\\
+      &\alpha > 0 \wedge c_2-1 < 0 \wedge \nabla f_k^T p_k < 0 (p_k \text{ is a descent dir})\\
+      &\implies y_k^T s_k > 0
     \end{align*}
-    Curvature condition holds.
+    Curvature condition holds when Wolfe line search is performed.
   \end{proof}
 
-  constrain $B$ by solving:
+  Choosing approximate Hessian, $B$:
+  
+  Force a unique solution among infinite many due to extra degrees of freedom in the matrix, few (n) constraining conditions imposed by secand equation, few (n) constraining conditions of PD. One approach is solving a optimization problem to make row rank update to previous iterate:
   \begin{align*}
     \min_B & ||B-B_k||\\
-    s.t. & \ B=B^T, Bs_k=y_k
+    s.t.\ &B=B^T \\
+    &Bs_k=y_k \text{ [seccant equation]}\\
+    &B \succ 0
   \end{align*}
-
-  similarly, constrain $B$'s inverse, $H$ where it satisfy secant equation:
+  alternatively, constrain $B$'s inverse, $H$:
   \begin{align*}
-    H_{k+1}y_k & = s_k\\
     \min_H & ||H-H_k||\\
-    s.t. & \ H=H^T, Hy_k=s_k
+    s.t.\ &H=H^T\\
+    &Hy_k=s_k
+    &H_{k+1}y_k & = s_k \text{ [secant equation]}\\
   \end{align*}
-  using weighted Frobenius norm:
+  
+  Different norms can be used. One choice: weighted Frobenius norm:
   \begin{align*}
     ||A||_W & := ||W^{1/2}AW^{1/2}||_F\\
     ||X||_F & := (\sum_i \sum_j (X_{ij})^2)^{1/2}
   \end{align*}
-  solved weight matrix $W$ satisfy $Ws_k=y_k$
-  solution given by:
+
+  \subsection{DFT update algorithm}
+  let $\bar{G_k}$ be the average Hessian:
   \begin{align*}
-    H_{k+1} & = (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T) \\
-            &+ \rho_k s_k^T s_k\\
-    \rho_k & = \frac{1}{y_k^Ts_k}
+    \bar{G_k} = \int_0^1 \nabla^2 f(x_k + \tau \alpha_k p_k) d \tau
   \end{align*}
-  $W$ is the average Hessian $\bar{G}$:
+  using Taylor's theorem:\\
+  $y_k = \bar{G_k} s_k = \bar{G_k} \alpha_k p_k$\\
+  let $W=\bar{G_k}^{-1}$\\
+  solve optimization problem:
   \begin{align*}
-    \bar{G} = \int_0^1 \nabla^2 f(x_k+\tau \alpha_k p_k) d\tau
+    &\min_B \| B - B_k \|_W\\
+    s.t.\ &W=\bar{G_k}^{-1}\\
+    &Bs_k=y_k\\
+    &B=B^T
   \end{align*}
   
-  initial $H_0$ can be chosen approximately (eg: finite differences, $I$)
+  Solution:
+  \begin{align*}
+    B_{k+1} &= (I-\rho_k y_k s_k^T)B_k(I - \rho_k s_k y_k^T) + \rho_k y_k y_k^T\\
+    \rho_k &= \frac{1}{y_k s_k}
+  \end{align*}
+
+  Computation simplification: inverse Hessian used in update of search direction: $p+k = - B_k^{-1} \nabla f_k$\\
+  Use Sherman-Morrison-Woodbury formula to obtain inverse.\\
+  let $H_k = B_k^{-1}$, then DFP update becomes:\\
+  \begin{align*}
+    H_{k+1} = H_k - \frac{H_k y_k y_k^T H_k}{y_k^T H_k y_k} + \frac{s_k s_k^T}{y_k^T s_k}
+  \end{align*}
+  This is a rank 2 modification to previous iterate for efficiency.
+  
+  \subsection{BFGS update algorithm}
+
+  Idea: impose condition on inverse of Hessian instead of Hessian approximation.\\
+
+  let $H$ be approximate inverse of Hessian, then impose:
+  \begin{align*}
+    H_{k+1} \succ 0\\
+    H_{k+1} = H_{k+1}^T\\
+    H_{k+1} y_k = s_k
+  \end{align*}
+
+  solve for $H$ in the optimization problem:
+  \begin{align*}
+    &\min_H \|H-H_k\|_W\\
+    s.t.\ &H=H^T\\
+    &H y_k = s_k\\
+  \end{align*}
+  where $y_k=W s_k$\\
+  
+  let $W$ be the average Hessian:\\
+  $\bar{G_k}=\int_0^1 \nabla^2 f(x_k + \tau \alpha_k p_k) d \tau$\\
+
+  solve to obtain:
+  \begin{align*}
+    H_{k+1} & = (I-\rho_k s_k y_k^T) H_k (I - \rho_k y_k s_k^T) + \rho_k s_k s_k^T\\
+    \rho_k & = \frac{1}{y_k^T s_k}
+  \end{align*}
+  
+%%   Weight matrix $W$ satisfies $Ws_k=y_k$.\\
+%%   $W$ is the average Hessian $\bar{G}$:
+%%   \begin{align*}
+%%     \bar{G} = \int_0^1 \nabla^2 f(x_k+\tau \alpha_k p_k) d\tau
+%%   \end{align*}
+
+%%   solution given by:
+%%   \begin{align*}
+%%     H_{k+1} & = (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T) \\
+%%             &+ \rho_k s_k^T s_k\\
+%%     \rho_k & = \frac{1}{y_k^Ts_k}
+%%   \end{align*}
+  
+  initial $H_0$ can be chosen approximately:
+  \begin{itemize}
+  \item finite diferences
+  \item $\alpha I$
+  \end{itemize}
   
   \begin{algorithm}[H]
     \SetKwInOut{Input}{$H_0,x_0,\epsilon>0$}\SetKwInOut{Output}{$x$}
@@ -201,14 +307,19 @@
     return $x$
     \caption{BFGS Algorithm\label{Algo_BFGS}}
   \end{algorithm}
+
+  Cost: $O(n^2)$ + cost of eval $f(.)$ + cost of eval $\nabla f(.)$.\\
+  Order of convergence: superlinear, worse than Newton but more computationally efficient than Newton.\\   
   
-  using Sherman-Morrison-Woodbury formula to obtain Hessian update equation:
+  Using Sherman-Morrison-Woodbury formula to obtain Hessian update equation,
   \begin{align*}
     B_{k+1} & = B_k - \frac{B_ks_k s_k^T B_k}{s_k^T B_k s_k} + \frac{y_k y_k^T}{y_k^T s_k}
   \end{align*}
-  proper line search is required so that BFGS algo captures curvature information\\
+  , but is it more efficient to use the inverse version.\\
   
-  inaccurate line search can be used to reduce computation cost
+  Proper line search is required so that BFGS algo captures curvature information.\\
+  
+  Inaccurate line search can be used to reduce computation cost.
   \vfill\null
   
   % \pagebreak
