@@ -473,7 +473,7 @@
   \end{align*}
 
 
-  $\nabla(\frac{1}{2} x^TAx-b^Tx) = Ax-b$, thus $\min_x x^TAx - b^Tx$ transformed to solving $Ax-b=0$.
+  $\nabla(\frac{1}{2} x^TAx-b^Tx) = Ax-b$, thus $\min_x x^TAx - b^Tx$ transformed to solving $Ax-b=0$. 
 
   let $x_{k+1} = x_k + \alpha_k p_k$, solve for $\alpha$:
   \begin{align*}
@@ -497,14 +497,21 @@
   \item Residual elimnated one direction at a time, resulting in max of n iterations.
   \item Optimal if Hessian is diagonal, if not can try preconditioning.
   \item Current residual is orthogonal to all previous search directions.
-  \item Any set of conjugate directions can be used (eg: eigenvectors, Gram-Schmidt)
+  \item Any set of conjugate directions can be used:
+    \begin{itemize}
+    \item eigenvectors
+    \item Gram-Schmidt
+    \item conjugate gradient algo.
+    \end{itemize}
   \end{itemize}
 
   \vfill\null
   \columnbreak
     
   \subsubsection{Termination Steps}
-  Theorem [T5.1] Conjugate direction algorithm converges to solution $x \in \R^n$ of linear system in n steps.
+  \begin{theorem}[Conjugate Direction Termination]\label{thm:CD_Term}
+    Conjugate direction algorithm converges to solution $x \in \R^n$ of linear system in n steps. Theorem [T5.1] in Num. Opt. book.
+  \end{theorem}
   \begin{proof}
     \begin{align*}
       &\text{given:}\\
@@ -526,6 +533,15 @@
     \end{align*}
     Conjugate direction algo. terminates in n steps.
   \end{proof}
+
+  If A is not diagonal, can transform coordinates:
+  \begin{align*}
+    S\hat{x} &= x\\
+    S &=[p_0\ p_1\ ..\ p_{n-1}],\ (\forall i \neq j)\ p_i A p_j =0\\
+    \phi(x) &= \frac{1}{2} x^T A x - b^T x\\
+    \phi(\hat{x}) &= \frac{1}{2} \hat{x}^T S^T A S \hat{x} - (S^T b)^T \hat{x}\\
+    S^T A S\ diagonal & \implies \text{can optimize one coordinate at a time}\\
+  \end{align*}
   
   \vfill\null
   \columnbreak
@@ -550,16 +566,13 @@
   $p_i^T r_k=0, i=[0,k-1]$ via induction:
   \begin{proof}
     \begin{align*}
-      &\text{base case}: x_1 = x_0 + \alpha_0 p_0 \text{ minimizes } \phi \text{ along } p_0\\
-      &\implies r_1^T p_0 = 0\\
+      &\text{base case of k=1, i=0}: x_1 = x_0 + \alpha_0 p_0 \text{ minimizes } \phi \text{ along } p_0\\
+      &\implies r_1^T p_0 = (r_0 + \alpha_0  A p_0)^T p_0= 0 \\
       &\text{case: }r_{k-1}^T p_i = 0, i=[0,k-2]:\\
       &r_k = r_{k-1} + \alpha_{k-1} A p_{k-1}\\
-      &p_{k-1}^T r_k = p_{k-1}^T r_{k-1} + \alpha_{k-1} p_{k-1}^T  A p_{k-1}=0(\text{by construction)}\\
-      &\text{A-conjugate} \implies p_{k-1}^T A p_{k-1}\\
-      &\text{case: }\forall i=[0,k-2]: p_i^T r_k=0\\
-      &p_i^T r_k = p_i^T r_{k-1} + \alpha_{k-1} p_i^T A p_{k-1}\\
-      &p_i^T r_{k-1} = 0 (\text{by induction hypothesis})\\
-      &\alpha_{k-1} p_i^T A p_{k-1} = 0 (conjugacy)\\
+      &(\forall i\in[0,k-2]) p_i^T r_k = p_i^T r_{k-1} + \alpha_{k-1} p_i^T A p_{k-1}\\
+      &(\forall i=[0,k-2]) p_i^T A p_{k-1}=0\ \text{(A-conjugacy by construction)}\\
+      &(\forall i=[0,k-2]) p_i^T r_{k-1} = 0\ \text{(by induction hypothesis)}\\
       &p_i^T r_k = 0, i=[0,k-1]
     \end{align*}
   \end{proof}
@@ -651,6 +664,17 @@
     \beta_{k+1}^{PR} & \leftarrow \frac{\nabla f_{k+1}^T (\nabla f_{k+1} - \nabla f_k)}{\nabla f_k^T \nabla f_k}\\
     \beta_{k+1}^+ & \leftarrow \max(\beta_{k+1}^{PR}, 0)
   \end{align*}
+
+
+  CG Gradient Algo. Property [T.5.3]:
+  \begin{align*}
+    &(\forall i=[0,k-1])\ r_k^T r_i=0\\
+    &span\{r_0,..,r_k\} = span\{r_0,Ar_0,..,A^kr_0\}\\
+    &span\{p_0,..,p_k\} = span\{r_0,Ar_0,..,A^kr_0\}\\
+    &(\forall i=[0,k-1])\ p_k^T A p_i = 0\\
+    &\implies \{x_k\}\ \text{converges to } x^*\ \text{in at most n steps}    
+  \end{align*}
+  Proof by induction to show generated search direcitons are A-conjugate. Then apply Theorem \ref{thm:CD_Term} to conclude algo terminates within n steps.
   
   \vfill\null
   \columnbreak
