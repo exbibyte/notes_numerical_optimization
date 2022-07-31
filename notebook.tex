@@ -848,8 +848,173 @@
     Todo
   \end{itemize}
 
-  \section{Subgradient Method}
-  todo
+  \vfill\null
+  \pagebreak
+    
+  \section{Smoothness}
+  $\beta$ smoothness:
+  \begin{align*}
+    & \frac{\beta}{2} \|x\|_2^2 - f(x) \text{ is convex (fit quadratic on top)}\\
+    & f(y) \leq f(x) + \nabla f(x)^T (y-x) + \frac{\beta}{2} \|y-x\|_2^2\\
+    & \implies \text{f is smooth}
+  \end{align*}
 
+  $\alpha$ strong convexity:
+  \begin{align*}
+    & f(x) - \frac{\alpha}{2} \|x\|_2^2 \text{ is convex (fit quadratic below)}\\
+    & f(y) \geq f(x) + \nabla f(x)^T (y-x) + \frac{\alpha}{2} \|y-x\|_2^2\\
+    & \text{f may not be smooth}
+  \end{align*}
+
+  Smoothness near optimal point: there always exists a step (length $<\frac{2}{\beta}$) that is a descent direction.
+
+  Property of f wrt. optimality value:\\
+  f is $\beta$-smooth $\implies$
+  \begin{align*}
+    \frac{1}{2 \beta} \|\nabla f(x) \|_2^2 \leq f(x) -f(x^*) \leq \frac{\beta}{2} \| x-x^* \|_2^2
+  \end{align*}
+  f is $\alpha$-strongly convex $\implies$
+  \begin{align*}
+    \frac{\alpha}{2} \| x-x^* \|_2^2 \leq f(x) -f(x^*) \leq \frac{1}{2 \alpha} \|\nabla f(x) \|_2^2
+  \end{align*}
+
+  Co-coercivity for $\beta$-smooth $f$:
+  \begin{align*}
+    \left(\nabla f(x) - \nabla f(y)\right)^T(x-y) \geq \frac{1}{\beta} \|\nabla f(x) - \nabla f(y)\|_2^2
+  \end{align*}
+  Coercivity for $\alpha$-strongly convex $f$:
+  \begin{align*}
+    \left(\nabla f(x) - \nabla f(y)\right)^T(x-y) \geq \alpha \|x - y\|_2^2
+  \end{align*}
+  
+  \subsection {Oracle based lower bounds}
+  Lipschitz convex function: error=$\mathcal{O}(\frac{1}{\sqrt{T}})$\\
+  Smooth convex function: $\epsilon=\mathcal{O}(\frac{1}{T^2})$\\
+  Smooth + strongly convex function: $\epsilon=\mathcal{O}(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1})$
+
+  \subsection {Gradient descent rate of convergence}
+  $\beta$-smooth $f$: $\mathcal{O}(\frac{1}{T})$\\
+  $\beta$-smooth + $\alpha$-strongly convex $f$: $\mathcal{O}((\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1})^T)$
+
+  \subsection {Gradient descent with momentum}
+  $f$ $\beta$-smooth, $\alpha$-s.c.:
+  \begin{align*}
+    & x_1=y_1 = x_{init}\\
+    & y_{t+1} = x_t - \frac{1}{\beta} \nabla f(x_t)\\
+    & x_{t+1} = \left(1+\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right) y_{t+1} - \left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right) y_t
+  \end{align*}
+
+  $f$ $\beta$-smooth:
+  \begin{align*}
+    & x_{t+1}=x_t-\eta \nabla f(x_t) \text{ [normal GD]}\\
+    & \text{momentum, nesterov accel.:}\\
+    & d_{t+1} = \gamma_{t+1}(x_{t+1} - x_t)\\
+    & x_{t+1} = (x_t + d_t) - \eta \nabla f(x_t + d_t)\\
+    & \epsilon=\mathcal{O}\left(\frac{1}{T^2}\right)
+  \end{align*}
+
+  \section {Common Algorithms}
+
+  \subsection {Projected Gradient}
+  \begin{align*}
+    & y_{t+1} = x_t - \eta g_t, g_t \in \partial f(x_t)\\
+    & x_{t+1} = proj_{X}(y_{t+1})\\
+    & x^*=proj_{X}(x^*) \text{ [fixed point at optimality]}
+  \end{align*}
+
+  \subsection {Proximal Gradient}
+  \begin{align*}
+    prox_{\eta h}(y) = \argmin_x h(x) + \frac{1}{2 \eta} \|x-y\|_2^2\\
+    x_{t+1} = prox_{\eta h}(x_t - \eta \nabla f(x_t))
+  \end{align*}
+  Special case of projected gradient:\\
+  let $h(x)=I_X(x) \implies prox_{\eta h} = proj_X$\\
+  where $I_X(x) =
+  \begin{cases}
+    0 &, x \in X\\
+    +\infty &, o/w
+  \end{cases}$
+
+  \subsubsection{Common proximal operators}
+  $h(x) = \|x\|_1$:\\
+  \begin{align*}
+    (prox_{\eta h}(x))_i & = \begin{cases}
+      x_i - \eta &, x_i \geq \eta\\
+      0 &, |x_i| \leq \eta\\
+      x_i + \eta &, x_i \leq -\eta
+    \end{cases}\\
+    & = \max(|x_i|-\eta,0)\ sign(x_i)
+  \end{align*}
+  
+  $h(x)=\frac{1}{2} x^T Q x + q^T x + q_0, Q \succeq 0$:
+  \begin{align*}
+    prox_{\eta h} = (I + \eta Q)^{-1} (x- \eta q)
+  \end{align*}
+
+  $h(x)=\sum_i h_i(x_i)$:
+  \begin{align*}
+    (prox_{\eta h}(x))_i = prox_{\eta h_i}(x_i) \text{ [parallelism]}
+  \end{align*}
+
+  Composite function:\\
+  $\min_x f(x) = g(x) + h(x)$, $g$ smooth, $h$ not smooth but has prox. operator.\\
+  Convergence due to non-smooth function: $\mathcal{O}(\frac{1}{\sqrt{T}})$\\
+
+  \subsection{L1 regularization with subgradient descent}
+  
+  \begin{align*}
+    & \min_x \|Ax-y\|_2^2 + \labda \|x\|_1\\
+    & g=\|Ax-y\|_2^2\\
+    & h=\lambda \|x\|_1\\
+    & \partial_x h(x) = \begin{cases}
+      -1 &, x_i < 0\\
+      [-1, 1] &, x_i = 0\\
+      1 &, x_i > 0
+    \end{cases}\\
+    & x_{t+1} = x_t - \eta (\nabla g(x_t) + \lambda \partial h(x))\\
+    & x_{t+1} = x_t - \eta (2A^T(Ax-y) + \lambda z)\\
+    & z=\begin{cases}
+    -1 &, x_i < 0\\
+    [-1,1] &, x_i = 0\\
+    1 &, x_i > 0
+    \end{cases}
+  \end{align*}
+  Convergence: $\epsilon=\mathcal{O}\left(\frac{1}{\sqrt{T}}\right)
+    
+  \subsection{ISTA (with proximal gardient)}
+  \begin{align*}
+    & \min_x g(x) + h(x), g\ \beta\text{-smooth}\\
+    & g(x) = \|Ax-y\|_2^2\\
+    & h(x) \lambda \|x\|_1\\
+    & x_{t+1} = prox_{\eta h}(x_t - \eta \nabla g(x_t))\\
+    & g\ \beta \text{-smooth, select } \eta = \frac{1}{\beta}\\
+    & x_{t+1} = prox_{\frac{1}{\beta} \lambda \|\dot\|_1}(x_t - \frac{1}{\beta} \nabla g(x_t))\\
+    & x_{t+1} = \argmin_x \lambda \|x\|_1 + \frac{\beta}{2} \|x-(x_t-\frac{1}{\beta} \nabla g(x_t))\|_2^2\\
+    & \nabla g(x_t) = 2A^T(Ax-y)
+  \end{align*}
+  Convergence: $\mathcal{O}\left(\frac{1}{\sqrt{T}}\right)
+
+  \subsection{FISTA}
+  \begin{align*}
+    & \min_x g(x) + h(x), g\ \beta\text{-smooth}\\
+    & \mu_0=0\\
+    & \mu_t = \frac{1+\sqrt{1+4\mu_t^2-1}}{2}\\
+    & \gamma_t = \frac{1-\mu_t}{\mu_{t+1}}\\
+    & x_1=z_1=\text{arbitrary}\\
+    & x_{t+1} = (1-\gamma_t) x_{t+1} + \gamma_t z_t\\
+    & z_{t+1} = prox_{\frac{\lambda}{\beta}\| \dot \|_1}(x_t - \frac{1}{\beta} \nabla g(x_t))
+  \end{align*}
+  Convergence: $\epsilon=\mathcal{O}\left(\frac{1}{T^2}\right)
+
+  
+  \section{Subgradient Method}
+  TODO
+
+  \section{Large Scale Optimization}
+
+  TODO
+  
   \end{multicols*}
 \end {document}
+
+
