@@ -461,6 +461,8 @@
   \end{algorithm}
 
   \subsection{Trust Region Newton CG Method}
+
+  \label{section_trust_region_newton_cg}
   Idea: use trust region algo for the outer iteration, use iterative CG based algorithm to solve for inner optimization problem.
 
   Outer iteraion: Algo \ref{Algo_TrustRegion}.\\
@@ -500,7 +502,7 @@
     \caption{Trust Region Newton-CG Subproblem (CG Steinhaug) \label{Algo_CG_Steihaug}}
   \end{algorithm}
   
-  $\epsilon_j$ can be chosen similar as in Line Search Newton-CG method, where $\{\eta_k\}$ is the forcing sequence.
+  $\epsilon_j$ can be chosen similarly as in Line Search Newton-CG method, where $\{\eta_k\}$ is the forcing sequence.
   
 
   \vfill\null
@@ -1053,6 +1055,25 @@
   TODO
 
   \section{Large Scale Optimization}
+
+  \subsection{Inexact Newton Methods}
+  
+  Iterative method with local convergence properties.\\
+
+  Residual: $r_k = \nabla^2 f_k p_k + \nabla f_k$\\
+  Termination condition: $\|r_k\| \leq \eta_k \|\nabla f_k\|, \eta_k \in (0,1)$\\
+
+
+  Convergence properties: see Thm 7.1, 7.2 (Nocedal)\\
+  
+  2 such algorithms:
+  \begin{enumerate}
+  \item Line Search Newton-CG
+  \item Trust Region Newton-CG (Section \ref{section_trust_region_newton_cg})
+  \end{enumerate}
+
+  \subsubsection{Line Search Newton-CG}
+  Augment original CG algorithm with line search, curvature check and forcing function check.\\
 
   
   
