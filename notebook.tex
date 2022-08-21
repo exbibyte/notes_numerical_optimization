@@ -360,7 +360,7 @@
     \While{$||\nabla f_k|| > \epsilon$}{
       $p_k \leftarrow
       \argminl_{p} f_k + g_k^Tp + \frac{1}{2}p^TB_kp,\ st.\ ||p||\leq \Delta_k$\\
-      $\rho_k = \frac{f(x_k)-f(x_k+p_k)}{m_k(0)-m_k(p_k)} //ratio test$\\
+      $\rho_k = \frac{f(x_k)-f(x_k+p_k)}{m_k(0)-m_k(p_k)}$//ratio test\\
       //change trust region for next iterate\\
       \uIf{$\rho_k<\gamma (:\frac{1}{4})$}{
         $\Delta_{k+1} \leftarrow \alpha (:\frac{1}{4}) \Delta_k //shrink$
@@ -460,7 +460,49 @@
     \caption{Subproblem Algo\label{Algo_TrustRegionIterativeSubproblem}}
   \end{algorithm}
 
+  \subsection{Trust Region Newton CG Method}
+  Idea: use trust region algo for the outer iteration, use iterative CG based algorithm to solve for inner optimization problem.
+
+  Outer iteraion: Algo \ref{Algo_TrustRegion}.\\
+
+  Inner optimization problem:
+  \begin{align*}
+    \min_{p \in \R^n} m(p) & = f + g^T p + \frac{1}{2} p^T B p\\
+    & s.t.\ \|p\| \leq \Delta
+  \end{align*}
   
+  \begin{algorithm}[H]
+    $\epsilon_k = \eta_k \| \nabla f_k\|$\\
+    $z_0 = 0$\\
+    $r_0 = \nabla f_k$\\
+    $d_0 = -r_0 = \nabla f_k$\\
+    \uIf{$\|r_0\| < \epsilon_k$}{
+      return $p_k=z_0=0$
+    }
+    \For{$j=0,1,..$}{
+      //dir of nonpositive curvature test\\
+      \uIf{$d_j^T B_k d_j \leq 0$}{ 
+        return $\argmin_{p_k} m_k(p_k=z_j + \tau d_j)$ s.t. $\|p_k\| = \Delta_k$
+      }
+      $\alpha_j = \frac{r_j^T r_j}{d_j^T B_k d_j}$\\
+      $z_{j+1}=z_j + \alpha_j d_j$\\
+      //trust region check\\
+      \uIf{\|z_{j+1}\| \geq \Delta_k}{
+        return $p_k : p_k = z_j + \tau d_j$ s.t. $\|p_k\| = \Delta_k, \tau \geq 0$
+      }
+      $r_{j+1} = r_j + \alpha_j B_k d_j$\\
+      \uIf{$\|r_{j+1} < \epsilon_k\|$}{
+        return $p_k=z_{j+1}$
+      }
+      $B_{j+1} = \frac{r_{j+1}^T r_{j+1}}{r_j^T r_j}$\\
+      $d_{j+1} = -r_{j+1} + B_{j+1} d_j$\\
+    }\\
+    \caption{Trust Region Newton-CG Subproblem (CG Steinhaug) \label{Algo_CG_Steihaug}}
+  \end{algorithm}
+  
+  $\epsilon_j$ can be chosen similar as in Line Search Newton-CG method, where $\{\eta_k\}$ is the forcing sequence.
+  
+
   \vfill\null
   \pagebreak
   
@@ -1012,7 +1054,7 @@
 
   \section{Large Scale Optimization}
 
-  TODO
+  
   
   \end{multicols*}
 \end {document}
