@@ -155,11 +155,10 @@
   \item gradient of $m_{k+1}$ matches gradient of objective function $f$ at iterate $x_{k+1}$
   \end{enumerate}
   \begin{align*}
-    \nabla m_{k+1}(0) & = \nabla f_{k+1} \\
-    & \implies m_{k+1} \text{ condition 1 satisfied}
+    \nabla m_{k+1}(0) & = \nabla f_{k+1} \implies \text{ condition 2 satisfied}
   \end{align*}
 
-  condition 2 (gradient of $m_{k+1}$ match gradient of objective $f$ at iterate $x_k$):
+  for condition 1 (gradient of $m_{k+1}$ match gradient of objective $f$ at iterate $x_k$):
   \begin{align*}
     \nabla m_{k+1}(-\alpha_k p_k) &= \nabla f_{k+1} - \alpha_k B_{k+1} p_k = \nabla f_k\\
     \nabla f_{k+1} - \nabla f_k &= \alpha_k B_{k+1} p_k\\
@@ -176,7 +175,7 @@
   \begin{proof}
     \begin{align*}
       &s_k=x_{k+1} - x_k = \alpha_k p_k\\
-      &y_K = \nabla f_{k+1} - \nabla f_k\\
+      &y_k = \nabla f_{k+1} - \nabla f_k\\
       &\text{Wolfe curvature condition:}\\
       &\nabla f_{k+1}^T p_k \geq c_2 \nabla f_k^T p_k, c_2 \in (0,1)\\
       &y_k^T s_k = (\nabla f_{k+1} - \nabla f_k)^T (\alpha_k p_k)\\
@@ -1055,15 +1054,18 @@
   TODO
 
   \section{Large Scale Optimization}
+\begin{enumerate}
+  \item memory reduction techniques with quasi-Newton methods.
+  \item Inexact Newton methods with superlinear local convergence properties, indefinite Hessian, Hessian-free impl.
+  \item function that is partial separable to use smaller subspaces.
+\end{enumerate}
 
+  
   \subsection{Inexact Newton Methods}
   
   Iterative method with local convergence properties.\\
-
   Residual: $r_k = \nabla^2 f_k p_k + \nabla f_k$\\
   Termination condition: $\|r_k\| \leq \eta_k \|\nabla f_k\|, \eta_k \in (0,1)$\\
-
-
   Convergence properties: see Thm 7.1, 7.2 (Nocedal)\\
   
   2 such algorithms:
