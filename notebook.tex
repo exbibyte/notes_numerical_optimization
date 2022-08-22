@@ -194,7 +194,7 @@
   \begin{align*}
     \min_B & ||B-B_k||\\
     s.t.\ &B=B^T \\
-    &Bs_k=y_k \text{ [seccant equation]}\\
+    &Bs_k=y_k \text{ [secant equation]}\\
     &B \succ 0
   \end{align*}
   alternatively, constrain $B$'s inverse, $H$:
@@ -211,7 +211,7 @@
     ||X||_F & := (\sum_i \sum_j (X_{ij})^2)^{1/2}
   \end{align*}
 
-  \subsection{DFT update algorithm}
+  \subsection{DFP update algorithm}
   let $\bar{G_k}$ be the average Hessian:
   \begin{align*}
     \bar{G_k} = \int_0^1 \nabla^2 f(x_k + \tau \alpha_k p_k) d \tau
@@ -233,7 +233,7 @@
     \rho_k &= \frac{1}{y_k s_k}
   \end{align*}
 
-  Computation simplification: inverse Hessian used in update of search direction: $p+k = - B_k^{-1} \nabla f_k$\\
+  Computation simplification: optimize for inverse Hessian instead  which is used in update of search direction: $p_k = - B_k^{-1} \nabla f_k$\\
   Use Sherman-Morrison-Woodbury formula to obtain inverse.\\
   let $H_k = B_k^{-1}$, then DFP update becomes:\\
   \begin{align*}
