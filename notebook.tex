@@ -124,15 +124,17 @@
 
   \subsection{Goldstein Condition}
   
-  \begin{align}
+  \begin{align*}
     &f_k+(1-c) \alpha_k \nabla f_k^T p_k \leq f_{k+1} \leq f_k + c \alpha \nabla f_k^T p_k\\
     &c \in (0,\frac{1}{2})
-  \end{align}
+  \end{align*}
 
-  may miss minimizer of $f$
+  may miss minimizer of $f$, commonly used in Newtom algo
 
   \subsection{Back Tracking Line Search}
-  
+
+  Using sufficient decrease condition and back tracking for step length search:
+
   \begin{algorithm}[H]
     \SetKwInOut{Input}{$f, x, d, c_1, \alpha, \beta$}\SetKwInOut{Output}{$\alpha$}
     \Input{function, x, direction, gradient threshold, initial step length, contraction}
@@ -144,8 +146,10 @@
     \caption{Line Search\label{Algo_LineSearch}}
   \end{algorithm}
   
-  % Todo: add section on derivatives
 
+  \vfill\null
+  \pagebreak
+    
   \section{Conjugate Gradient}
 
   \subsection{linear method}
@@ -246,19 +250,21 @@
   $p_i^T r_k=0, i=[0,k-1]$ via induction:
   \begin{proof}
     \begin{align*}
-      &\text{base case of k=1, i=0}: x_1 = x_0 + \alpha_0 p_0 \text{ minimizes } \phi \text{ along } p_0\\
+      &\text{base case of k=1, i=0}: x_1 = x_0 + \alpha_0 p_0\\
+      &\text{ minimizes } \phi \text{ along } p_0\\
       &\implies r_1^T p_0 = (r_0 + \alpha_0  A p_0)^T p_0= 0 \\
       &\text{case: }r_{k-1}^T p_i = 0, i=[0,k-2]:\\
       &r_k = r_{k-1} + \alpha_{k-1} A p_{k-1}\\
       &(\forall i\in[0,k-2]) p_i^T r_k = p_i^T r_{k-1} + \alpha_{k-1} p_i^T A p_{k-1}\\
-      &(\forall i=[0,k-2]) p_i^T A p_{k-1}=0\ \text{(A-conjugacy by construction)}\\
+      &\text{(A-conjugacy by construction):}\\
+      &(\forall i=[0,k-2]) p_i^T A p_{k-1}=0\\
       &(\forall i=[0,k-2]) p_i^T r_{k-1} = 0\ \text{(by induction hypothesis)}\\
       &p_i^T r_k = 0, i=[0,k-1]
     \end{align*}
   \end{proof}
 
   \vfill\null
-  \pagebreak
+  \columnbreak
   
   \subsection{Conjugate Gradient Method}
   Idea:
@@ -356,10 +362,10 @@
     &\implies \{x_k\}\ \text{converges to } x^*\ \text{in at most n steps}    
   \end{align*}
   Proof by induction to show generated search direcitons are A-conjugate. Then apply Theorem \ref{thm:CD_Term} to conclude algo terminates within n steps.
-  
+    
   \vfill\null
-  \columnbreak
-  
+  \pagebreak
+    
   \section{Quasi Newton}
 
   \subsection{Concept}
@@ -578,10 +584,9 @@
     & A^{-1}\ exists \implies\\
     & (A+uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^TA^{-1}}{1+v^TA^{-1}u} \iff 1 + v^T A^{-1} u \neq 0
   \end{align*}
-  
+
   \vfill\null
-  
-  % \pagebreak
+  \pagebreak
   
   \section{Trust Region Methods}
   idea:
@@ -812,7 +817,7 @@
   $\epsilon_j$ can be chosen similarly as in Line Search Newton-CG method, where $\{\eta_k\}$ is the forcing sequence.
   
   \vfill\null
-  \columnbreak  
+  \pagebreak
     
   \section{Proximal Algorithm}
   Idea:
@@ -984,7 +989,7 @@
   \end{itemize}
 
   \vfill\null
-  \columnbreak
+  \pagebreak
     
   \section{Smoothness}
   $\beta$ smoothness:
@@ -1048,6 +1053,9 @@
     & \epsilon=\mathcal{O}\left(\frac{1}{T^2}\right)
   \end{align*}
 
+  \vfill\null
+  \pagebreak
+    
   \section {Common Algorithms}
 
   \subsection {Projected Gradient}
@@ -1056,12 +1064,13 @@
     & x_{t+1} = proj_{X}(y_{t+1})\\
     & x^*=proj_{X}(x^*) \text{ [fixed point at optimality]}
   \end{align*}
-
+  
   \subsection {Proximal Gradient}
   \begin{align*}
     prox_{\eta h}(y) = \argmin_x h(x) + \frac{1}{2 \eta} \|x-y\|_2^2\\
     x_{t+1} = prox_{\eta h}(x_t - \eta \nabla f(x_t))
   \end{align*}
+  
   Special case of projected gradient:\\
   let $h(x)=I_X(x) \implies prox_{\eta h} = proj_X$\\
   where $I_X(x) =
@@ -1071,7 +1080,7 @@
   \end{cases}$
 
   \subsubsection{Common proximal operators}
-  $h(x) = \|x\|_1$:\\
+  $h(x) = \|x\|_1$:
   \begin{align*}
     (prox_{\eta h}(x))_i & = \begin{cases}
       x_i - \eta &, x_i \geq \eta\\
@@ -1092,8 +1101,7 @@
   \end{align*}
 
   Composite function:\\
-  $\min_x f(x) = g(x) + h(x)$, $g$ smooth, $h$ not smooth but has prox. operator.\\
-  Convergence due to non-smooth function: $\mathcal{O}(\frac{1}{\sqrt{T}})$\\
+  $\min_x f(x) = g(x) + h(x)$, $g$ smooth, $h$ not smooth but has prox. operator. Convergence due to non-smooth function: $\mathcal{O}(\frac{1}{\sqrt{T}})$
 
   \subsection{L1 regularization with subgradient descent}
   
@@ -1114,7 +1122,7 @@
     1 &, x_i > 0
     \end{cases}
   \end{align*}
-  Convergence: $\epsilon=\mathcal{O}\left(\frac{1}{\sqrt{T}}\right)
+  Convergence: $\epsilon=\mathcal{O}\left(\frac{1}{\sqrt{T}}\right)$
     
   \subsection{ISTA (with proximal gardient)}
   \begin{align*}
@@ -1141,10 +1149,15 @@
   \end{align*}
   Convergence: $\epsilon=\mathcal{O}\left(\frac{1}{T^2}\right)
 
-  
+  \vfill\null
+  \pagebreak
+    
   \section{Subgradient Method}
   TODO
 
+  \vfill\null
+  \pagebreak
+    
   \section{Large Scale Optimization}
 \begin{enumerate}
   \item memory reduction techniques with quasi-Newton methods.
@@ -1205,7 +1218,7 @@
 
   Ideally: $\nabla f(x) = \sum_i \nabla f_i(x), \nabla^2 f(x) = \sum_i \nabla^2 f_i(x)$.\\
 
-  Use Hessian approximations for individual element functions.\\
+  Use Hessian approximations for individual element functions.\\ 
 
   Use chain rule to transform into msaller spaces and back to original space via compactifying matrices.\\
 
