@@ -68,14 +68,22 @@
 
   \section{General}
 
-  line search conditions (1st and 2nd order), how to choose step length and direction:\\
-  
-  sufficient decrease, proportional to $\alpha_k$ step length and directional derivative $\nabla f_k^T p_k$:
+  \subsection{Wolfe conditions}
+
+  \begin{itemize}
+    
+  \item Sufficient Decrease/ Armijo Condition
+    
+  Decrease proportional to $\alpha_k$ step length and directional derivative $\nabla f_k^T p_k$:
   \begin{align}
-    f_{k+1}^T & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k\\
-    \nabla f_k^T p_k & \leq 0\ //by\ construction
+    f_{k+1} & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k\\
+    \nabla f_k^T p_k & \leq 0\ //by\ construction\\
+    c_1 & \in (0,1)
   \end{align}
-  curvature:
+  
+  \item Curvature Condition
+  
+  Reject extremely short steps:
   \begin{align}
     \nabla f_{k+1}^T p_k & \geq c_2 \nabla f_k^T p_k\\
     \frac{\partial \phi(\alpha_k)}{\partial \alpha_k} & \geq \frac{\partial \phi(0)}{\partial \alpha_k}\\
@@ -90,12 +98,18 @@
   & \frac{\partial \phi(0)}{\partial \alpha_k} = \nabla f_{k}^T p_k //initial\ slope
   \end{align*}
 
-  strong Wolfe curvature condition, to restrict large positive derivative:
+  \end{itemize}
+  
+  \subsection{Strong Wolfe Condition}
+  
+  Modify curvature condition to reject large positive derivative:
   \begin{align}
-    | \nabla f_{k+1}^T p_k| \leq c_2 |\nabla f_k^T p_k|
+    f_{k+1} & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k\\
+    | \nabla f_{k+1}^T p_k| & \leq c_2 |\nabla f_k^T p_k|
   \end{align}
   
-  Form of search direction:
+  \subsection{Form of Search Direction}
+  
   \begin{align}
     p_k = - B_k^{-1} \nabla f_k
   \end{align}
@@ -105,11 +119,16 @@
     \nabla f_k^T(-B_k^{-1} \nabla f_k) < 0
   \end{align}
 
-  Goldstein condition (may miss minimizer of $f$):
+  \subsection{Goldstein Condition}
+  
   \begin{align}
     &f_k+(1-c) \alpha_k \nabla f_k^T p_k \leq f_{k+1} \leq f_k + c \alpha \nabla f_k^T p_k\\
     &c \in (0,\frac{1}{2})
   \end{align}
+
+  may miss minimizer of $f$
+
+  \subsection{Back Tracking Line Search}
   
   \begin{algorithm}[H]
     \SetKwInOut{Input}{$f, x, d, c_1, \alpha, \beta$}\SetKwInOut{Output}{$\alpha$}
