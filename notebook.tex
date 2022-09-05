@@ -62,7 +62,7 @@
 
 \begin {document}
 
-\lhead{Notes - Numerical Optimization}
+\lhead{Notes - Numerical Optimization, Bill (Yuan) Liu}
 
 \begin{multicols*}{2}
 
@@ -70,6 +70,8 @@
 
   \subsection{Wolfe conditions}
 
+  Finding a step length $\alpha_k$ given a search direction $p_k$.
+  
   \begin{itemize}
     
   \item Sufficient Decrease/ Armijo Condition
@@ -105,7 +107,8 @@
   Modify curvature condition to reject large positive derivative:
   \begin{align}
     f_{k+1} & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k\\
-    | \nabla f_{k+1}^T p_k| & \leq c_2 |\nabla f_k^T p_k|
+    | \nabla f_{k+1}^T p_k| & \leq c_2 |\nabla f_k^T p_k|\\
+    0 & < c_1 < c_2 < 1
   \end{align}
   
   \subsection{Form of Search Direction}
