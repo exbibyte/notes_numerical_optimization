@@ -495,6 +495,21 @@
 %%             &+ \rho_k s_k^T s_k\\
 %%     \rho_k & = \frac{1}{y_k^Ts_k}
 %%   \end{align*}
+
+  Deduce from rank 2 update:\\
+  $B_{k+1} = B_k + U_k + V_k$\\
+  $U_k, V_k$ are rank 1 symmetric matrices:\\
+  $U_k = \alpha uu^T, V_k = \beta vv^T$\\
+  Let $u=y_k, v=B_ks_k$\\
+  $B_{k+1} = B_k + \alpha y_k y_k^T + \beta B_k s_k (B_k s_k)^T$\\
+  Impose secant condition:\\
+  $B_{k+1} s_k = y_k = B_k s_k + \alpha y_k y_k^T s_k + \beta B_k s_k (B_k s_k)^T s_k$\\
+  Solve for $\alpha, \beta$:\\
+  $\alpha = \frac{1}{y_k^T s_k}$\\
+  $\beta = \frac{-1}{(B_k s_k)^T s_k}$\\
+  $B_{k+1} = B_k + \frac{y_k y_k^T}{y_k^T s_k} - \frac{B_k s_k (B_k s_k)^T}{s_k^T B_k^T s_k}$\\
+  Use Sherman-Morrison formula to get $B^{-1}$ and optimize with inverse Hessian in order to avoid computing inverses in the actual algorithm:\\
+  $B_{k+1}^{-1} = H_{k+1} = (I- \frac{s_k y_k^T}{y_k^T s_k})H_k(I- \frac{y_ks_k^T}{y_k^T s_k}) + \frac{s_k s_k^T}{y_k^T s_k}$\\
   
   initial $H_0$ can be chosen approximately:
   \begin{itemize}
@@ -507,14 +522,16 @@
     \Input{inverse Hessian approx., initial point, convergence tolerance}
     \Output{solution}
     $k \leftarrow$ 0\\
-    $p_k \leftarrow -B^{-1} \nabla f(x_k) = -H\nabla f(x_k)$\\
+    //until convergence\\
     \While{$||\nabla f_k|| > \epsilon$}{
-      $\alpha_k \leftarrow $ LineSearch(..)\\
+      $p_k \leftarrow -B_k^{-1} \nabla f(x_k) = -H_k\nabla f(x_k)$\\
+      $\alpha_k \leftarrow $ LineSearch($p_k, f, \nabla f$)\\
       $x_{k+1} \leftarrow x_k + \alpha_k p_k$\\
       $s_k \leftarrow x_{k+1} - x_k$\\
       $y_k \leftarrow \nabla f_{k+1} - \nabla f_k$\\
       $\rho_k \leftarrow \frac{1}{y_k^Ts_k}$\\
-      $H_{k+1} \leftarrow (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T) + \rho_k s_k s_k^T$\\
+      //update inverse Hessian approximation for next iterate\\
+      $H_{k+1} \leftarrow (I-\rho_k s_k y_k^T)H_k(I-\rho_k y_k s_k^T) + \rho_k s_k s_k^T$\\
       $k \leftarrow k+1$\\
     }
     return $x$
@@ -526,13 +543,20 @@
   
   Using Sherman-Morrison-Woodbury formula to obtain Hessian update equation,
   \begin{align*}
-    B_{k+1} & = B_k - \frac{B_ks_k s_k^T B_k}{s_k^T B_k s_k} + \frac{y_k y_k^T}{y_k^T s_k}
+    B_{k+1} & = B_k - \frac{B_ks_k s_k^T B_k^T}{s_k^T B_k^T s_k} + \frac{y_k y_k^T}{y_k^T s_k}
   \end{align*}
   , but is it more efficient to use the inverse version.\\
   
   Proper line search is required so that BFGS algo captures curvature information.\\
   
   Inaccurate line search can be used to reduce computation cost.
+
+  \subsection{Sherman-Morrison}
+  \begin{align*}
+    & A^{-1}\ exists \implies\\
+    & (A+uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^TA^{-1}}{1+v^TA^{-1}u} \iff 1 + v^T A^{-1} u \neq 0
+  \end{align*}
+  
   \vfill\null
   
   % \pagebreak
@@ -620,9 +644,50 @@
   Cauchy Point (sufficient reduction in model value):\\
   Use 1st order approx. of model and steepest descent direciton to get next iterate, bounded within trust region.\\
 
-  [TODO: insert section on Cauchy Point]\\
+  \vfill\null
+  \pagebreak
+    
+  \subsection{Cauchy Point}
+  Idea: find an approximate step that would still achieve convergence in a sequence of steps.\\
+  Use linear version of the model:
+  \begin{align*}
+    & p_k^s = \argmin_p f_k + g_k^T p\\
+    & s.t.\ \|p\| \leq \Delta_k
+  \end{align*}
+
+  $p_k^s = - \frac{\|\Delta_k\|}{\|g_k\|} g_k$\\
+
+  Solve for step length in the original model with trust region:
+  \begin{align*}
+    & \tau_k = \argmin_{\tau \geq 0 } m_k(\tau p_k^s)\\
+    & s.t.\ \|\tau p_k^s\| \leq \Delta_k
+  \end{align*}
+
+  Cauchy point: $p_k^c = \tau_k p_k^s$\\
+
+  Solutions for $\tau_k$:
+  \begin{align*}
+  \begin{cases}
+    g_k^T B_k g_k \leq 0 &, g_k \neq 0 \implies m_k(\tau_k p_k^s)\\
+    & monotonically\ decreasing,\\
+    & \tau_k = 1,\\
+    g_k^T B_k g_k > 0 &, m_k(\tau_k p_k^s)\ convex\ \\
+    & quadratic,\\
+    & \tau_k=min(1, \frac{\|g_k\|^3}{\Delta_k g_k^T B_k g_k}),\\
+    & either: boundary\ val\ of\ \Delta_k,\\
+    & or\ unconstrained\ minimizer\ of\ \\
+    & quadratic
+  \end{cases}
+  \end{align*}
+
+  Cauchy point $p_k^c$ inexpensive to calculate.\\
+
+  [TODO] derive $\tau_k$ for case of $g_k^T B_k g_k > 0$.
   
   \subsection{Dogleg method}
+
+  Idea: improve on Cauchy point in considering curvature information. Requires $B \succ 0$.\\
+  
   if $B \succ 0$:\\
   $p^B=-B^{-1}g$\\
   $p^*=p^B$ if $\Delta \geq \|p^B\|$\\
@@ -1100,6 +1165,7 @@
         $\alpha_j = \frac{r_j^T r_j}{d_j^T B_k d_j}$\\
         $z_{j+1}  = z_j + \alpha_j d_j$\\
         $r_{j+1} = r_j + \alpha_j B_k d_j$\\\
+        //forcing function constraint\\
         \uIf{$\|r_{j+1}\| < \epsilon_k = \eta_k \|\nabla f_k\|$}{
           break $p_k = z_{j+1}$
         }
