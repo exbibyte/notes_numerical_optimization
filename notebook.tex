@@ -838,7 +838,9 @@
   \end{align*}
   
   \subsection{Proximal Gradient Method}
-  Solve $\min_{x} g(x)+f(x)$, where $f,g$ are closed, convex functions and $f$ differentiable
+  Solve $\min_{x} g(x)+f(x)$, where $f,g$ are closed, convex functions and $f$ differentiable.\\
+  
+  Idea: combine Proximal point algorithm with gradient projection method. Gradient step on $f$, and proximal point algo step on $g$.
   \begin{align*}
     &x^* = prox_{\lambda^k g}(x^k-\lambda^k \nabla f(x^k)) \\
     &=\argminl_{x} g(x) + \frac{1}{2 \lambda^k} \|x - (x^k - \lambda^k \nabla f(x^k))\|_2^2\\
@@ -1249,6 +1251,118 @@
   which can be used in trust region algo to get $p_k$:\\
   
   $B_k p_k = -\nabla f_k$.
+
+  \vfill\null
+  \pagebreak
+    
+  \section{Nonlinear Penalty Based Methods}
+
+  \subsection{Quadratic Penalty}
+  Inexact, iterative method.\\
+  
+  Idea: add a weighted quadratic penalty term per constraint to the objective. Form a sequence of probems with increasing weights to penalty terms.\\
+  
+  $\min_x f(x)\ s.t.\ c_i(x)=0, i\in \mathcal{E}$\\
+  $Q(x;\mu) = f(x) + \frac{\mu}{2} \sum_i c_i(x)^2$\\
+  $\mu_k \rightarrow +\infty\ as\ k \rightarrow +\infty$\\
+
+  Use unconstrained optimization techniques and use previous iterate as starting point for current iteration.\\
+  
+  May diverges when penalty weight if not big enough.\\
+
+  Ill conditioning of Hessian when $\mu_k$ becomes large at the minimizer. CG and Quasi-Newton not suitable. Newton's method may still have problems: numerical inaccuracies when solving linear equations to calculate step, and Taylor series 2nd order approximation onyl accurate in a small neighbourhood of x so it may not generate useful step unless $\mu_{k+1}$ is chosen slightly larger than $\mu_k$.
+
+  For the case of equality and inequality constrained problem:
+  \begin{align*}
+    & \min_x f(x)\\
+    & s.t.\ c_i(x)=0, i\in \mathcal{E}\\
+    & s.t.\ c_i(x)\geq 0, i\in \mathcal{I}\\
+    & Q(x;\mu) = f(x) + \frac{\mu}{2} \sum_i c_i(x)^2 + \frac{\mu}{2} \sum_i max(-c_i(x), 0)^2
+  \end{align*}
+
+  \begin{algorithm}[H]
+    $x_0^s = ..$\\
+    $\mu_0 > 0$\\
+    $\{\tau_k\} \rightarrow 0$\\
+    \For{$k=0,1,..$}{
+      solve $x_k = \argmin_x Q(x; \mu_k)$ with initial guess $x_k^s$ with termination condition $\|\nabla_x Q(x;\mu_k)\| \leq \tau_k$\\
+      \uIf{final convergence criteria passes}{
+        return approx solution
+      }
+      update $\mu_{k+1}: \mu_{k+1} > \mu_k$ (eg: chosen adaptively)\\
+      update $x_{k+1}^s \leftarrow x_k$
+    }\\
+    \caption{Quadratic Penalty Algo \label{Algo_quadratic_penalty}}
+  \end{algorithm}
+    
+  \subsection{Augmented Lagrangian}
+  Add estimated Lagrange multipliers term to quadratic penalty formulation. Differs from standard Lagrangian with the extra quadratic terms.\\
+  $Q(x, \lambda; \mu) = f(x) - \sum_i \lambda_i c_i(x) + \frac{\mu}{2} \sum_i c_i(x)^2, \forall i \in \mathcal{E}$\\
+  
+  Idea: fix $\mu_k, \lambda_k$ at current iteration, minimized wrt. $x$, update estimate of Lagrangian variables.
+
+  $x_k = \argmin_x L(x, \lambda_k; \mu_k)$\\
+  Optimality condition for uncstained minimization:\\
+  $0 \approx \nabla_x L(x_k, \lambda_k; \mu_k) = \nabla f(x_k) - \sum_{i \in \mathcal{E}}(\lambda_{k,i} - \mu_k c_i(x_k)) \nabla c_i(x_k)$\\
+  $\lambda_i^* \approx \lambda_{k,i} - \mu_k c_i(x_k), \forall i \in \mathcal{E}$\\
+  Update of Lagrangian variables follow naturally.\\
+  $\lambda_{k+1,i} \leftarrow \lambda_{k,i} - \mu_k c_i(x_k), \forall i \in \mathcal{E}$\\
+  $c_i(x_k) \approx \frac{\lambda_{k,i} - \lambda_i^*}{\mu_k}$\\
+  If $\lambda_{k,i}$ close to $\lambda_i^*$, then $c_i(x_k) \ll \frac{1}{\mu_k}$, this is better than quadratic penalty method's $c_i(x_k)\approx \frac{-\lambda_i^*}{\mu_k}, \forall i \in \mathcal{E}$\\
+
+  Even with modest penalty weight, $\mu_k$, $c_i(x_k)$ is more like 0 which is require for optimality condition, this allows convergence without having $\mu_k \rightarrow +\infty$. Less ill conditioning and initial starting point is less critical.\\
+
+  Tolerance $\tau_k$ can be chosen on infeasibility, $\sum_i |c(x_k)|$, and can be increased if infeasibility reduction in insufficient.
+  
+  \begin{algorithm}[H]
+    $x_0^s = ..$\\
+    $\lambda_0 = ..$\\
+    $\tau_0 > 0$\\
+    $\mu_0 > 0$\\
+    \For{$k=0,1,..$}{
+      solve $x_k = \argmin_x L(x, \lambda_k; \mu_k)$ starting at $x_k^s$ with termination condition $\|\nabla_x Q(x, \lambda_k;\mu_k)\| \leq \tau_k$\\
+      \uIf{$c_i(x)=0, \forall i \in \mathcal{E}$}{
+        return $x_k$
+      }
+      $\lambda_{k+1,i} \leftarrow \lambda_{k,i} - \mu_k c_i(\lambda_{k,i})\\
+      update $\mu_{k+1}: \mu_{k+1} > \mu_k$ (eg: chosen adaptively)\\
+      update $x_{k+1}^s \leftarrow x_k$\\
+      update $\tau_{k+1}^s \leftarrow ...$
+    }\\
+    \caption{Augmented Lagrangian Algo \label{Algo_augmented_lagrangian}}
+  \end{algorithm}
+
+  Augmented Lagrangian Approaches:
+  \begin{itemize}
+  \item bound constained
+  \item linearly constrained
+  \item unconstrained
+  \end{itemize}
+
+  \subsubsection{Bound Constrained}
+  Introduce slack variables for inequalities, transform into equality constrained problem with variable bound constraints.\\
+
+  $\min_x f(x),\ s.t.\ c_i(x) = 0\ \forall i,\ l \leq x \leq u$\\
+  
+  Solve the subprobem using augmented Lagrangian with nonlinear gradient probjection method by fixing $\lambda, \mu$.\\
+  $\min_x L(x, \lambda_k; \mu_k) = f(x) - \sum_i \lambda_i c_i(x) + \frac{\mu}{2}\sum_i c_i(x)^2$\\
+  
+  1st order necessary conditions for $x$:\\
+  $x - Proj_{[l,u]}(x-\nabla_x L(x,\lambda; \mu), l, u) = 0$\\
+
+  TODO: [insert algo 17.4 nocedal]
+
+  \subsubsection{Linearly Constrained}
+  TODO
+
+  \subsubsection{Unconstrained}
+  TODO
+  
+  \vfill\null
+  \pagebreak
+
+  \section{Factorization}
+  TODO
   
   \end{multicols*}
 \end {document}
