@@ -1387,9 +1387,9 @@
 
   Augmented Lagrangian Approaches:
   \begin{itemize}
-  \item bound constained
-  \item linearly constrained
-  \item unconstrained
+  \item Bound Constained
+  \item Linearly Constrained Lagrangian
+  \item Unconstrained
   \end{itemize}
 
   \subsubsection{Bound Constrained}
@@ -1405,12 +1405,71 @@
 
   TODO: [insert algo 17.4 nocedal]
 
-  \subsubsection{Linearly Constrained}
-  TODO
+  \subsubsection{Linearly Constrained Lagrangian}
+  Idea: lienarize constraints and generate a step by minimizing Lagragian.
+  \begin{align*}
+    & \min_x F_k(x) = f(x) - \sum_i \lambda_i^k \bar{c}_i^k(x) + \frac{\mu}{2} \sum_i [\bar{c}_i^k(x)]^2\\
+    s.t.\ & c(x_k) + A_k(x-x_k)=0\\
+    & \bar{c}_i^k(x) = c_i(x) - (c_i(x_k) + \nabla c_i(x_k)^T (x-x_k))\\
+    & l \leq x \leq u
+  \end{align*}
+
+  where $A_k$ is the constraint Jacobian.\\
 
   \subsubsection{Unconstrained}
-  TODO
+  Idea: use proximal point approach for inequality constrained problems.
+  \begin{align*}
+    \min_x F(x) & = \max_{\lambda \geq 0} \{f(x) - \sum_{i \in \mathcal{I}} \lambda_i c_i(x) \} \\
+    &= \begin{cases}
+        f(x) &, if\ x\ feasible\\
+        \infty &, o/w
+    \end{cases}
+  \end{align*}
   
+  \begin{align*}
+    \begin{cases}
+      x\ \text{feasible} &, (c_i(x)<0),\ select\ \lambda_i\ large,\ \lambda_j = 0, \forall j \neq i\\
+      & \implies F(x) \rightarrow \infty\\
+      x\ \text{infeasible} &, (c_i(x) \geq 0), \forall i \in \mathcal{I},\ select\ (\forall i \in \mathcal{I})\lambda_i= 0\\
+      & \implies F(x) = f(x)
+    \end{cases}
+  \end{align*}
+
+  Then $\min_x F(x) = \min_{x\ feasible} f(x)$\\
+
+  Use an approximation $\hat{F}(x; \lambda^k, \mu_k)$ to $F$ that is smooth for practical optimization:
+
+  $\hat{F}(x; \lambda_^, \mu_k) = \max_{\lambda \geq o} \{ f(x) - \sum_{i \in \mathcal{I}} \lambda_i c_i(x) - \frac{1}{2 \mu_k} \sum_{i \in \mathcal{I}}(\lambda_i - \lambda_i^k)^2 \}$\\
+
+  This is a bound constrained quadratic program in $lambda$, separable in individual components $\lambda_i$. The additional proximal term helps staying close to $\lambda_i^k$.\\
+
+  We perform maximization explicitly:\\
+  
+  $\lambda_i = \begin{cases}
+    0 &, -c_i(x) + \frac{\lambda_i^k}{\mu_k} \leq 0\\
+    \lambda_i^k - \mu_k c_i(x) &, o/w
+  \end{cases}$
+
+  Substitute $\lambda_i$ back in $\hat{F}$:\\
+  
+  $\hat{F}(x; \lambda^k, \mu_k) = f(x) + \sum_{i \in \mathcal{I}} \psi(c_i(x), \lambda_i^k; \mu_k)$\\
+  
+  $\psi(t,\sigma; \mu) = \begin{cases}
+    - \sigma t + \frac{\mu}{2} t^2 &, t - \frac{\sigma}{\mu} \leq 0\\
+    - \frac{1}{2} \mu} \sigma^2} &, o/w
+  \end{cases}$
+
+  New iterate $x_k$ is found by minimizing $\hat{F}$:\\
+
+  $x_K = \argmin_x \hat{F}(x; \lambda_k, \mu_k)$\\
+
+  New Lagrangian multiplier update rule:\\
+  
+  $\lambda_i^{k+1} = \begin{cases}
+    0 &, -c_i(x) + \frac{\lambda_i^k}{\mu_k} \leq 0\\
+    \lambda_i^k - \mu_k c_i(x) &, o/w
+    \end{cases}$
+    
   \vfill\null
   \pagebreak
 
