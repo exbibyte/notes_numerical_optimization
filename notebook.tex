@@ -1258,9 +1258,8 @@
   \section{Nonlinear Penalty Based Methods}
 
   \subsection{Quadratic Penalty}
-  Inexact, iterative method.\\
   
-  Idea: add a weighted quadratic penalty term per constraint to the objective. Form a sequence of probems with increasing weights to penalty terms.\\
+  Inexact, iterative method. Idea: add a weighted quadratic penalty term per constraint to the objective. Form a sequence of probems with increasing weights to penalty terms.\\
   
   $\min_x f(x)\ s.t.\ c_i(x)=0, i\in \mathcal{E}$\\
   $Q(x;\mu) = f(x) + \frac{\mu}{2} \sum_i c_i(x)^2$\\
@@ -1272,6 +1271,13 @@
 
   Ill conditioning of Hessian when $\mu_k$ becomes large at the minimizer. CG and Quasi-Newton not suitable. Newton's method may still have problems: numerical inaccuracies when solving linear equations to calculate step, and Taylor series 2nd order approximation onyl accurate in a small neighbourhood of x so it may not generate useful step unless $\mu_{k+1}$ is chosen slightly larger than $\mu_k$.
 
+
+  let $A(x)^T = [\nabla c_i(x)]_{i \in \mathcal{E}}$\\
+  $Q(x; \mu_k) = f(x) + \sum_{i \in \mathcal{E}} \mu_k c_i(x_k)$\\
+  $\nabla_x Q(x; \mu_k) = \nabla f(x) + \sum_{i \in \mathcal{E}} \mu_k c_i(x_k) \nabla c_i(x_k)$\\
+  $\nabla_{xx}^2 Q(x; \mu_k) = \nabla^2 f(x) + \sum_{i \in \mathcal{E}} \mu_k c_i(x) \nabla^2 c_i(x) + \mu_k A(x)^TA(x)$\\
+  $\nabla_{xx}^2 Q(x; \mu_k) \approx \nabla_{xx}^2 L(x; \lambda^*) + \mu_k A(x)^T A(x)$ near minimizer where $\mu_k A(x)^T A(x)$ may be ill conditioned as $\mu_k \rightarrow \infty$\\
+  
   For the case of equality and inequality constrained problem:
   \begin{align*}
     & \min_x f(x)\\
@@ -1280,6 +1286,9 @@
     & Q(x;\mu) = f(x) + \frac{\mu}{2} \sum_i c_i(x)^2 + \frac{\mu}{2} \sum_i max(-c_i(x), 0)^2
   \end{align*}
 
+  \vfill\null
+  \columnbreak
+  
   \begin{algorithm}[H]
     $x_0^s = ..$\\
     $\mu_0 > 0$\\
@@ -1294,6 +1303,50 @@
     }\\
     \caption{Quadratic Penalty Algo \label{Algo_quadratic_penalty}}
   \end{algorithm}
+
+  \subsection{Nonsmooth Penalty Methods}
+
+  \subsubsection{L1 Penalty}
+  Exact method, not rely on updating stratefor penalty parameter. Penalty function:\\
+
+  $\phi(x;\mu) = f(x) + \mu \sum_{i \in \mathcal{E}}\|c_i(x)\| + \mu \sum_{i \in \mathcal{I}} \max(0, -c_i(x))$\\
+
+  If $x^*$ is a strict local minimizer then $x^*$ is a local minimizer of $\phi(x;\mu)$ for $\forall \mu > \mu^*$, where $\mu^*=||\lambda^*||_{\infty} = \max_{i \in \mathcal{I} \cup \mathcal{E}} | \lambda_i^*|$, $\lambda_i$s being lagrange multiplers. This generates enough penalization when going into infeasible resion to keep $x^*$ as local minimizer.
+
+  Nonsmooth function, but has directional derivatives $D(\phi(x;\mu);p)$ along $p$.\\
+
+  $\hat{x}$ is a stationary point for $\phi(x;\mu)$ if $D(\phi(\hat{x}, \mu); p) \geq 0, \forall p$\\
+
+  $\hat{x}$ is a stationary point of measure of infeasibility $h(x) = \sum_{i \in \mathcal{E}}|c_i(x)| + \sum_{i \in \mathcal{I}} max(0, -c_i(x))$ if $D(\phi(\hat{x}, \mu); p) \geq 0, \forall p$\\
+
+  \begin{algorithm}[H]
+    $x_0^s = ..$\\
+    $\mu_0 > 0$\\
+    $\tau = ..$\\
+    \For{$k=0,1,..$}{
+      solve approximately $x_k = \argmin_x \phi(x; \mu_k)$ with initial guess $x_k^s$
+      \uIf{$h(x_k) \leq \tau$}{
+        return $x_k$
+      }
+      update $\mu_{k+1}: \mu_{k+1} > \mu_k$\\
+      update new starting point: $x_{k+1}^s$
+    }\\
+    \caption{Classic L1 Penalty Algo \label{Algo_l1_classic_penalty}}
+  \end{algorithm}
+
+  Practical L1 penalty method: linearize constraints, replace nonlinear objective by a quadratic. Convert to a smooth QP problem by new slack variables and solve with standard QP solver.
+  \begin{align*}
+    & \min_{p,r,s,t} f(x) + \frac{1}{2} p^T W p + \nabla f(x)^T p\\
+    & + \mu \sum_{i \in \mathcal{E}} (r_i + s_i) + \mu \sum_{i \in \mathcal{I}} t_i\\
+    s.t. & \nabla c_i(x)^T p + c_i(x) = r_i - s_i, i \in \mathcal{E}\\
+    & \nabla c_i(x)^T p + c_i(x) \geq -t_i, i \in \mathcal{I}\\
+    & r,s,t \geq 0
+  \end{align*}    
+
+  Possible issue: $\mu_k$ is critical to success of iteration. Strategy: choose $\mu$ slightly larger than $\|\lambda^*\|_{\infty}$ but that depends on lagrange multipler estimate.
+  
+  \vfill\null
+  \columnbreak
     
   \subsection{Augmented Lagrangian}
   Add estimated Lagrange multipliers term to quadratic penalty formulation. Differs from standard Lagrangian with the extra quadratic terms.\\
