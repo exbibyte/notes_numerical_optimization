@@ -76,29 +76,29 @@
     
   \item Sufficient Decrease/ Armijo Condition
     
-  Decrease proportional to $\alpha_k$ step length and directional derivative $\nabla f_k^T p_k$:
-  \begin{align}
-    f_{k+1} & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k\\
-    \nabla f_k^T p_k & \leq 0\ //by\ construction\\
-    c_1 & \in (0,1)
-  \end{align}
-  
+    Decrease proportional to $\alpha_k$ step length and directional derivative $\nabla f_k^T p_k$:
+    \begin{align}
+      f_{k+1} & \leq f_k + c_1 \alpha_k \nabla f_k^T p_k\\
+      \nabla f_k^T p_k & \leq 0\ //by\ construction\\
+      c_1 & \in (0,1)
+    \end{align}
+    
   \item Curvature Condition
-  
-  Reject extremely short steps:
-  \begin{align}
-    \nabla f_{k+1}^T p_k & \geq c_2 \nabla f_k^T p_k\\
-    \frac{\partial \phi(\alpha_k)}{\partial \alpha_k} & \geq \frac{\partial \phi(0)}{\partial \alpha_k}\\
-              &c_1,\alpha_k \in (0,1)\\
-    &0<c_1<c_2<1
-  \end{align}
-  \begin{align*}
-  \text{where}:& f_{k} = f(x_k)\\
-  & f_{k+1} = f(x_k+\alpha_k p_k)\\
-  & \phi(\alpha_k) = f(x_k + \alpha_k p_k)\\
-  & \frac{\partial \phi(\alpha_k)}{\partial \alpha_k} = \nabla f_{k+1}^T p_k\\
-  & \frac{\partial \phi(0)}{\partial \alpha_k} = \nabla f_{k}^T p_k //initial\ slope
-  \end{align*}
+    
+    Reject extremely short steps:
+    \begin{align}
+      \nabla f_{k+1}^T p_k & \geq c_2 \nabla f_k^T p_k\\
+      \frac{\partial \phi(\alpha_k)}{\partial \alpha_k} & \geq \frac{\partial \phi(0)}{\partial \alpha_k}\\
+      &c_1,\alpha_k \in (0,1)\\
+      &0<c_1<c_2<1
+    \end{align}
+    \begin{align*}
+      \text{where}:& f_{k} = f(x_k)\\
+      & f_{k+1} = f(x_k+\alpha_k p_k)\\
+      & \phi(\alpha_k) = f(x_k + \alpha_k p_k)\\
+      & \frac{\partial \phi(\alpha_k)}{\partial \alpha_k} = \nabla f_{k+1}^T p_k\\
+      & \frac{\partial \phi(0)}{\partial \alpha_k} = \nabla f_{k}^T p_k //initial\ slope
+    \end{align*}
 
   \end{itemize}
   
@@ -149,7 +149,7 @@
 
   \vfill\null
   \pagebreak
-    
+  
   \section{Conjugate Gradient}
 
   \subsection{linear method}
@@ -191,7 +191,7 @@
     \item conjugate gradient algo.
     \end{itemize}
   \end{itemize}
-    
+  
   \subsubsection{Termination Steps}
   \begin{theorem}[Conjugate Direction Termination]\label{thm:CD_Term}
     Conjugate direction algorithm converges to solution $x \in \R^n$ of linear system in n steps. Theorem [T5.1] in Num. Opt. book.
@@ -362,10 +362,10 @@
     &\implies \{x_k\}\ \text{converges to } x^*\ \text{in at most n steps}    
   \end{align*}
   Proof by induction to show generated search direcitons are A-conjugate. Then apply Theorem \ref{thm:CD_Term} to conclude algo terminates within n steps.
-    
+  
   \vfill\null
   \pagebreak
-    
+  
   \section{Quasi Newton}
 
   \subsection{Concept}
@@ -511,18 +511,18 @@
     \rho_k & = \frac{1}{y_k^T s_k}
   \end{align*}
   
-%%   Weight matrix $W$ satisfies $Ws_k=y_k$.\\
-%%   $W$ is the average Hessian $\bar{G}$:
-%%   \begin{align*}
-%%     \bar{G} = \int_0^1 \nabla^2 f(x_k+\tau \alpha_k p_k) d\tau
-%%   \end{align*}
+  %%   Weight matrix $W$ satisfies $Ws_k=y_k$.\\
+  %%   $W$ is the average Hessian $\bar{G}$:
+  %%   \begin{align*}
+  %%     \bar{G} = \int_0^1 \nabla^2 f(x_k+\tau \alpha_k p_k) d\tau
+  %%   \end{align*}
 
-%%   solution given by:
-%%   \begin{align*}
-%%     H_{k+1} & = (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T) \\
-%%             &+ \rho_k s_k^T s_k\\
-%%     \rho_k & = \frac{1}{y_k^Ts_k}
-%%   \end{align*}
+  %%   solution given by:
+  %%   \begin{align*}
+  %%     H_{k+1} & = (I-\rho_k s_k y_k^T)H_k(I-\rho_ky_ks_k^T) \\
+  %%             &+ \rho_k s_k^T s_k\\
+  %%     \rho_k & = \frac{1}{y_k^Ts_k}
+  %%   \end{align*}
 
   Deduce from rank 2 update:\\
   $B_{k+1} = B_k + U_k + V_k$\\
@@ -613,11 +613,11 @@
   \begin{align*}
     &\rho_k = \frac{f(x_k)-f(x_k+p_k)}{m_k(0)-m_k(p_k) \geq 0}\\
     &action \leftarrow
-      \begin{cases}
-        \text{expand trust region} &, \rho_k \approx 1\ (agreement)\\
-        \text{shrink trust region} &, \rho_k  < 0 + \text{thresh}\\
-        \text{keep trust region} &, o/w
-      \end{cases}  
+    \begin{cases}
+      \text{expand trust region} &, \rho_k \approx 1\ (agreement)\\
+      \text{shrink trust region} &, \rho_k  < 0 + \text{thresh}\\
+      \text{keep trust region} &, o/w
+    \end{cases}  
   \end{align*}
 
   \begin{algorithm}[H]
@@ -639,13 +639,13 @@
 
       //accept/reject for current iterate\\
       \uIf{$\rho_k > \eta (: \in [0, \frac{1}{4}))$}{
-        $x_{k+1} \leftarrow x_k + p_k$
+          $x_{k+1} \leftarrow x_k + p_k$
+        }
+        \Else{
+          $x_{k+1} \leftarrow x_k$
+        }
       }
-      \Else{
-        $x_{k+1} \leftarrow x_k$
-      }
-    }
-    \caption{Trust Region Algorithm\label{Algo_TrustRegion}}
+      \caption{Trust Region Algorithm\label{Algo_TrustRegion}}
   \end{algorithm}
 
   Minimizer of the 2nd order Taylor series satisfy the following as a global solution for trust region iff:
@@ -673,7 +673,7 @@
 
   \vfill\null
   \pagebreak
-    
+  
   \subsection{Cauchy Point}
   Idea: find an approximate step that would still achieve convergence in a sequence of steps.\\
   Use linear version of the model:
@@ -694,17 +694,17 @@
 
   Solutions for $\tau_k$:
   \begin{align*}
-  \begin{cases}
-    g_k^T B_k g_k \leq 0 &, g_k \neq 0 \implies m_k(\tau_k p_k^s)\\
-    & monotonically\ decreasing,\\
-    & \tau_k = 1,\\
-    g_k^T B_k g_k > 0 &, m_k(\tau_k p_k^s)\ convex\ \\
-    & quadratic,\\
-    & \tau_k=min(1, \frac{\|g_k\|^3}{\Delta_k g_k^T B_k g_k}),\\
-    & either: boundary\ val\ of\ \Delta_k,\\
-    & or\ unconstrained\ minimizer\ of\ \\
-    & quadratic
-  \end{cases}
+    \begin{cases}
+      g_k^T B_k g_k \leq 0 &, g_k \neq 0 \implies m_k(\tau_k p_k^s)\\
+      & monotonically\ decreasing,\\
+      & \tau_k = 1,\\
+      g_k^T B_k g_k > 0 &, m_k(\tau_k p_k^s)\ convex\ \\
+      & quadratic,\\
+      & \tau_k=min(1, \frac{\|g_k\|^3}{\Delta_k g_k^T B_k g_k}),\\
+      & either: boundary\ val\ of\ \Delta_k,\\
+      & or\ unconstrained\ minimizer\ of\ \\
+      & quadratic
+    \end{cases}
   \end{align*}
 
   Cauchy point $p_k^c$ inexpensive to calculate.\\
@@ -741,8 +741,8 @@
   $p_k^C=\tau_k p_k^S$\\
   $p_k^C=-\tau_k \frac{\Delta_k g_k}{\|g_k\|}$\\
   $\tau_k=\begin{cases}
-    1 &, g_k^T B_k g_k \leq 0\\
-    min(\frac{\|g_k|^3}{\Delta_k g_k^T B_k g_k}, 1) &, o/w
+  1 &, g_k^T B_k g_k \leq 0\\
+  min(\frac{\|g_k|^3}{\Delta_k g_k^T B_k g_k}, 1) &, o/w
   \end{cases}$
 
   [TODO: add section on 2D subspace minimization method]\\
@@ -771,7 +771,7 @@
 
   \vfill\null
   \columnbreak
-    
+  
   \subsection{Trust Region Newton CG Method}
 
   \label{section_trust_region_newton_cg}
@@ -818,7 +818,7 @@
   
   \vfill\null
   \pagebreak
-    
+  
   \section{Proximal Algorithm}
   Idea:
   \begin{itemize}
@@ -864,633 +864,815 @@
   \end{align*}
 
   Example: $w^k = \frac{k}{k+3}, w^0 = 0, \lambda^k \in (0,1/L], L:= \text{Lipschitz constant of }\nabla f,\ or\ \lambda^k$ found via line search.
-  Line search for $\lambda^k$ (Beck and Teboulle):
+    Line search for $\lambda^k$ (Beck and Teboulle):
 
-  \begin{algorithm}[H]
-    $\hat{f}(x,y):=f(y) + \nabla f(y)^T(x-y) + \frac{1}{2\lambda}\|x-y\|^2_2$\\
-    \While{True}{
-      $z = prox_{\lambda g}(y^k-\lambda \nabla f(y^k))$\\
-      \uIf{$f(x) \leq \hat{f}(z,y^k)$}{
-        break
+    \begin{algorithm}[H]
+      $\hat{f}(x,y):=f(y) + \nabla f(y)^T(x-y) + \frac{1}{2\lambda}\|x-y\|^2_2$\\
+      \While{True}{
+        $z = prox_{\lambda g}(y^k-\lambda \nabla f(y^k))$\\
+        \uIf{$f(x) \leq \hat{f}(z,y^k)$}{
+          break
+        }
+        $\lambda = \beta \lambda$
       }
-      $\lambda = \beta \lambda$
-    }
-    return $\lambda^k := \lambda, x^{k+1} := z$\\
-    \caption{Proximal Gradient Algorithm\label{Algo_ProximalGradient}}
-  \end{algorithm}
+      return $\lambda^k := \lambda, x^{k+1} := z$\\
+      \caption{Proximal Gradient Algorithm\label{Algo_ProximalGradient}}
+    \end{algorithm}
 
-  \subsection{Types of Proximal Operators}
-  \begin{itemize}
-  \item quadratic functions
-    \begin{align*}
-      f&=\frac{1}{2} \|.\|_x^2 \implies prox_{\lambda f}(v) = (\frac{1}{1+\lambda})v\\
-      f&=\frac{1}{2}x^T A x + b^T x + c, A \in S_+^n \implies\\
-      &prox_{\lambda f}(v)=(I+\lambda)^{-1}(v-\lambda b)
-    \end{align*}
-  \item unconstrained problem: use gradient methods such as Newton, Quasi-Newton
-  \item constrained: use projected subgradient for non-smooth, projected gradient or interior method for smooth
-  \item separable function: if scalar, may be solved analytically, eg:
-    L1 norm separable to:
-    \begin{align*}
-      f(x) = |x| \implies prox_{\lambda f}(v) =
-      \begin{cases}
-        v-\lambda ,& v \geq \lambda\\
-        0,& |v| \leq \lambda\\
-        v+\lambda, & v \leq -\lambda
-      \end{cases}
-    \end{align*}
-    \begin{align*}
-      f(x) = -log(x) \implies prox_{\lambda f}(v) = \frac{v+\sqrt{v^2+4\lambda}}{2}
-    \end{align*}
-  \item general scalar function
+    \subsection{Types of Proximal Operators}
     \begin{itemize}
-    \item localization: using a subgradient oracle and bisection algorithm
-    \item twice continuously differentiable: guarded Newton method
-    \end{itemize}
-  \item polyhedra constraint, quadratic objective: solve as QP problem
-    \begin{itemize}
-    \item duality to reduce number of variables to solve if possible
-    \item gram matrix caching
-    \item affine constraint($Ax=b$): use pseudo-inverse, $A^{+}$:
+    \item quadratic functions
       \begin{align*}
-        \Pi_C(v) &= v - A^{+}(Av-b)\\
-                 &A \in R^{m \times n}, m < n \implies A^{+} = A^T(AA^T)^{-1}\\
-                 &A \in R^{m \times n}, m > n \implies A^{+} = (A^TA)^{-1}A^T
+        f&=\frac{1}{2} \|.\|_x^2 \implies prox_{\lambda f}(v) = (\frac{1}{1+\lambda})v\\
+        f&=\frac{1}{2}x^T A x + b^T x + c, A \in S_+^n \implies\\
+        &prox_{\lambda f}(v)=(I+\lambda)^{-1}(v-\lambda b)
       \end{align*}
-    \item hyperplane constaint($a^Tx=b$):
+    \item unconstrained problem: use gradient methods such as Newton, Quasi-Newton
+    \item constrained: use projected subgradient for non-smooth, projected gradient or interior method for smooth
+    \item separable function: if scalar, may be solved analytically, eg:
+      L1 norm separable to:
       \begin{align*}
-        \Pi_C(v) = v + (\frac{b-a^Tb}{\|a\|_2^2})a
-      \end{align*}
-    \item halfspace
-      \begin{align*}
-        \Pi_C(v) = v - \frac{max(a^T v -b,0)}{\|a\|_2^2}a
-      \end{align*}
-    \item box($l\leq x \leq u$)
-      \begin{align*}
-        \Pi_C(v)_k = min(max(v_k, l_k), u_k)
-      \end{align*}
-    \item probability simplex($1^Tx= 1, x \geq 0$)\\
-      bisection algo on $\nu$:
-      \begin{align*}
-        \Pi_C(v) = (v- \nu 1)_+\\
-        \text{intial }[l_k,u_k] = [\max_i v_i-1, \max_i vi]
-      \end{align*}
-      analytically solve when bounded in between 2 adjacent v_i's      
-    \end{itemize}
-  \item cones ($\kappa$: proper cone)\\
-    problem of the form:
-    \begin{align*}
-      min_x \|x-v\|_2^2\\
-      s.t.: x\in \kappa
-    \end{align*}
-    \begin{align*}
-      x \in \kappa\\
-      v=x-\lambda\\
-      \lambda\in\kappa^*\\
-      \lambda^Tx=0
-    \end{align*}
-    \begin{itemize}
-    \item cone $C=\R_+^n$
-      \begin{align*}
-        \Pi_C(v)=v_+
-      \end{align*}
-    \item 2nd order cone $C=\{(x,t)\in \R^{n+1}: \|x\|_2 \leq t\}$
-      \begin{align*}
-        \Pi_C(v,s) = \begin{cases}
-          0,& \|v\|_2 \leq -s\\
-          (v,s),& \|v\|_2 \leq s\\
-          \frac{1}{2}(1+\frac{s}{\|v\|_2})(v,\|v\|_2),& \|v\|_2 \geq |s|
+        f(x) = |x| \implies prox_{\lambda f}(v) =
+        \begin{cases}
+          v-\lambda ,& v \geq \lambda\\
+          0,& |v| \leq \lambda\\
+          v+\lambda, & v \leq -\lambda
         \end{cases}
       \end{align*}
-    \item PSD cone $S_+^n$
       \begin{align*}
-        \Pi_C(V)&=\sum_i (\lambda_i)_+ u_i u_i^T\\
-        V&=\sum_i \lambda_i u_i u_i^T\ (eigendecomp)
+        f(x) = -log(x) \implies prox_{\lambda f}(v) = \frac{v+\sqrt{v^2+4\lambda}}{2}
       \end{align*}
-    \item exponential cone\\
+    \item general scalar function
+      \begin{itemize}
+      \item localization: using a subgradient oracle and bisection algorithm
+      \item twice continuously differentiable: guarded Newton method
+      \end{itemize}
+    \item polyhedra constraint, quadratic objective: solve as QP problem
+      \begin{itemize}
+      \item duality to reduce number of variables to solve if possible
+      \item gram matrix caching
+      \item affine constraint($Ax=b$): use pseudo-inverse, $A^{+}$:
+        \begin{align*}
+          \Pi_C(v) &= v - A^{+}(Av-b)\\
+          &A \in R^{m \times n}, m < n \implies A^{+} = A^T(AA^T)^{-1}\\
+          &A \in R^{m \times n}, m > n \implies A^{+} = (A^TA)^{-1}A^T
+        \end{align*}
+      \item hyperplane constaint($a^Tx=b$):
+        \begin{align*}
+          \Pi_C(v) = v + (\frac{b-a^Tb}{\|a\|_2^2})a
+        \end{align*}
+      \item halfspace
+        \begin{align*}
+          \Pi_C(v) = v - \frac{max(a^T v -b,0)}{\|a\|_2^2}a
+        \end{align*}
+      \item box($l\leq x \leq u$)
+        \begin{align*}
+          \Pi_C(v)_k = min(max(v_k, l_k), u_k)
+        \end{align*}
+      \item probability simplex($1^Tx= 1, x \geq 0$)\\
+        bisection algo on $\nu$:
+        \begin{align*}
+          \Pi_C(v) = (v- \nu 1)_+\\
+          \text{intial }[l_k,u_k] = [\max_i v_i-1, \max_i vi]
+        \end{align*}
+        analytically solve when bounded in between 2 adjacent v_i's      
+      \end{itemize}
+    \item cones ($\kappa$: proper cone)\\
+      problem of the form:
+      \begin{align*}
+        min_x \|x-v\|_2^2\\
+        s.t.: x\in \kappa
+      \end{align*}
+      \begin{align*}
+        x \in \kappa\\
+        v=x-\lambda\\
+        \lambda\in\kappa^*\\
+        \lambda^Tx=0
+      \end{align*}
+      \begin{itemize}
+      \item cone $C=\R_+^n$
+        \begin{align*}
+          \Pi_C(v)=v_+
+        \end{align*}
+      \item 2nd order cone $C=\{(x,t)\in \R^{n+1}: \|x\|_2 \leq t\}$
+        \begin{align*}
+          \Pi_C(v,s) = \begin{cases}
+            0,& \|v\|_2 \leq -s\\
+            (v,s),& \|v\|_2 \leq s\\
+            \frac{1}{2}(1+\frac{s}{\|v\|_2})(v,\|v\|_2),& \|v\|_2 \geq |s|
+          \end{cases}
+        \end{align*}
+      \item PSD cone $S_+^n$
+        \begin{align*}
+          \Pi_C(V)&=\sum_i (\lambda_i)_+ u_i u_i^T\\
+          V&=\sum_i \lambda_i u_i u_i^T\ (eigendecomp)
+        \end{align*}
+      \item exponential cone\\
+        Todo
+      \end{itemize}
+    \item pointwise supremum
+      \begin{itemize}
+      \item max function
+      \item support function
+      \end{itemize}
+    \item norms
+      \begin{itemize}
+      \item L2
+      \item L1
+      \item L-$\inf$
+      \item elastic net
+      \item sum of norms
+      \item matrix norm
+      \end{itemize}
+    \item sublevel set
+    \item epigraph
+    \item matrix functions
       Todo
     \end{itemize}
-  \item pointwise supremum
-    \begin{itemize}
-    \item max function
-    \item support function
-    \end{itemize}
-  \item norms
-    \begin{itemize}
-    \item L2
-    \item L1
-    \item L-$\inf$
-    \item elastic net
-    \item sum of norms
-    \item matrix norm
-    \end{itemize}
-  \item sublevel set
-  \item epigraph
-  \item matrix functions
-    Todo
-  \end{itemize}
 
-  \vfill\null
-  \pagebreak
+    \vfill\null
+    \pagebreak
     
-  \section{Smoothness}
-  $\beta$ smoothness:
-  \begin{align*}
-    & \frac{\beta}{2} \|x\|_2^2 - f(x) \text{ is convex (fit quadratic on top)}\\
-    & f(y) \leq f(x) + \nabla f(x)^T (y-x) + \frac{\beta}{2} \|y-x\|_2^2\\
-    & \implies \text{f is smooth}
-  \end{align*}
+    \section{Smoothness}
+    $\beta$ smoothness:
+    \begin{align*}
+      & \frac{\beta}{2} \|x\|_2^2 - f(x) \text{ is convex (fit quadratic on top)}\\
+      & f(y) \leq f(x) + \nabla f(x)^T (y-x) + \frac{\beta}{2} \|y-x\|_2^2\\
+      & \implies \text{f is smooth}
+    \end{align*}
 
-  $\alpha$ strong convexity:
-  \begin{align*}
-    & f(x) - \frac{\alpha}{2} \|x\|_2^2 \text{ is convex (fit quadratic below)}\\
-    & f(y) \geq f(x) + \nabla f(x)^T (y-x) + \frac{\alpha}{2} \|y-x\|_2^2\\
-    & \text{f may not be smooth}
-  \end{align*}
+    $\alpha$ strong convexity:
+    \begin{align*}
+      & f(x) - \frac{\alpha}{2} \|x\|_2^2 \text{ is convex (fit quadratic below)}\\
+      & f(y) \geq f(x) + \nabla f(x)^T (y-x) + \frac{\alpha}{2} \|y-x\|_2^2\\
+      & \text{f may not be smooth}
+    \end{align*}
 
-  Smoothness near optimal point: there always exists a step (length $<\frac{2}{\beta}$) that is a descent direction.
+    Smoothness near optimal point: there always exists a step (length $<\frac{2}{\beta}$) that is a descent direction.
 
-  Property of f wrt. optimality value:\\
-  f is $\beta$-smooth $\implies$
-  \begin{align*}
-    \frac{1}{2 \beta} \|\nabla f(x) \|_2^2 \leq f(x) -f(x^*) \leq \frac{\beta}{2} \| x-x^* \|_2^2
-  \end{align*}
-  f is $\alpha$-strongly convex $\implies$
-  \begin{align*}
-    \frac{\alpha}{2} \| x-x^* \|_2^2 \leq f(x) -f(x^*) \leq \frac{1}{2 \alpha} \|\nabla f(x) \|_2^2
-  \end{align*}
+    Property of f wrt. optimality value:\\
+    f is $\beta$-smooth $\implies$
+    \begin{align*}
+      \frac{1}{2 \beta} \|\nabla f(x) \|_2^2 \leq f(x) -f(x^*) \leq \frac{\beta}{2} \| x-x^* \|_2^2
+    \end{align*}
+    f is $\alpha$-strongly convex $\implies$
+    \begin{align*}
+      \frac{\alpha}{2} \| x-x^* \|_2^2 \leq f(x) -f(x^*) \leq \frac{1}{2 \alpha} \|\nabla f(x) \|_2^2
+    \end{align*}
 
-  Co-coercivity for $\beta$-smooth $f$:
-  \begin{align*}
-    \left(\nabla f(x) - \nabla f(y)\right)^T(x-y) \geq \frac{1}{\beta} \|\nabla f(x) - \nabla f(y)\|_2^2
-  \end{align*}
-  Coercivity for $\alpha$-strongly convex $f$:
-  \begin{align*}
-    \left(\nabla f(x) - \nabla f(y)\right)^T(x-y) \geq \alpha \|x - y\|_2^2
-  \end{align*}
-  
-  \subsection {Oracle based lower bounds}
-  Lipschitz convex function: error=$\mathcal{O}(\frac{1}{\sqrt{T}})$\\
-  Smooth convex function: $\epsilon=\mathcal{O}(\frac{1}{T^2})$\\
-  Smooth + strongly convex function: $\epsilon=\mathcal{O}(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1})$
-
-  \subsection {Gradient descent rate of convergence}
-  $\beta$-smooth $f$: $\mathcal{O}(\frac{1}{T})$\\
-  $\beta$-smooth + $\alpha$-strongly convex $f$: $\mathcal{O}((\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1})^T)$
-
-  \subsection {Gradient descent with momentum}
-  $f$ $\beta$-smooth, $\alpha$-s.c.:
-  \begin{align*}
-    & x_1=y_1 = x_{init}\\
-    & y_{t+1} = x_t - \frac{1}{\beta} \nabla f(x_t)\\
-    & x_{t+1} = \left(1+\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right) y_{t+1} - \left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right) y_t
-  \end{align*}
-
-  $f$ $\beta$-smooth:
-  \begin{align*}
-    & x_{t+1}=x_t-\eta \nabla f(x_t) \text{ [normal GD]}\\
-    & \text{momentum, nesterov accel.:}\\
-    & d_{t+1} = \gamma_{t+1}(x_{t+1} - x_t)\\
-    & x_{t+1} = (x_t + d_t) - \eta \nabla f(x_t + d_t)\\
-    & \epsilon=\mathcal{O}\left(\frac{1}{T^2}\right)
-  \end{align*}
-
-  \vfill\null
-  \pagebreak
+    Co-coercivity for $\beta$-smooth $f$:
+    \begin{align*}
+      \left(\nabla f(x) - \nabla f(y)\right)^T(x-y) \geq \frac{1}{\beta} \|\nabla f(x) - \nabla f(y)\|_2^2
+    \end{align*}
+    Coercivity for $\alpha$-strongly convex $f$:
+    \begin{align*}
+      \left(\nabla f(x) - \nabla f(y)\right)^T(x-y) \geq \alpha \|x - y\|_2^2
+    \end{align*}
     
-  \section {Common Algorithms}
+    \subsection {Oracle based lower bounds}
+    Lipschitz convex function: error=$\mathcal{O}(\frac{1}{\sqrt{T}})$\\
+    Smooth convex function: $\epsilon=\mathcal{O}(\frac{1}{T^2})$\\
+    Smooth + strongly convex function: $\epsilon=\mathcal{O}(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1})$
 
-  \subsection {Projected Gradient}
-  \begin{align*}
-    & y_{t+1} = x_t - \eta g_t, g_t \in \partial f(x_t)\\
-    & x_{t+1} = proj_{X}(y_{t+1})\\
-    & x^*=proj_{X}(x^*) \text{ [fixed point at optimality]}
-  \end{align*}
-  
-  \subsection {Proximal Gradient}
-  \begin{align*}
-    prox_{\eta h}(y) = \argmin_x h(x) + \frac{1}{2 \eta} \|x-y\|_2^2\\
-    x_{t+1} = prox_{\eta h}(x_t - \eta \nabla f(x_t))
-  \end{align*}
-  
-  Special case of projected gradient:\\
-  let $h(x)=I_X(x) \implies prox_{\eta h} = proj_X$\\
-  where $I_X(x) =
-  \begin{cases}
-    0 &, x \in X\\
-    +\infty &, o/w
-  \end{cases}$
+    \subsection {Gradient descent rate of convergence}
+    $\beta$-smooth $f$: $\mathcal{O}(\frac{1}{T})$\\
+    $\beta$-smooth + $\alpha$-strongly convex $f$: $\mathcal{O}((\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1})^T)$
 
-  \subsubsection{Common proximal operators}
-  $h(x) = \|x\|_1$:
-  \begin{align*}
-    (prox_{\eta h}(x))_i & = \begin{cases}
-      x_i - \eta &, x_i \geq \eta\\
-      0 &, |x_i| \leq \eta\\
-      x_i + \eta &, x_i \leq -\eta
-    \end{cases}\\
-    & = \max(|x_i|-\eta,0)\ sign(x_i)
-  \end{align*}
-  
-  $h(x)=\frac{1}{2} x^T Q x + q^T x + q_0, Q \succeq 0$:
-  \begin{align*}
-    prox_{\eta h} = (I + \eta Q)^{-1} (x- \eta q)
-  \end{align*}
+    \subsection {Gradient descent with momentum}
+    $f$ $\beta$-smooth, $\alpha$-s.c.:
+    \begin{align*}
+      & x_1=y_1 = x_{init}\\
+      & y_{t+1} = x_t - \frac{1}{\beta} \nabla f(x_t)\\
+      & x_{t+1} = \left(1+\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right) y_{t+1} - \left(\frac{\sqrt{\kappa}-1}{\sqrt{\kappa}+1}\right) y_t
+    \end{align*}
 
-  $h(x)=\sum_i h_i(x_i)$:
-  \begin{align*}
-    (prox_{\eta h}(x))_i = prox_{\eta h_i}(x_i) \text{ [parallelism]}
-  \end{align*}
+    $f$ $\beta$-smooth:
+    \begin{align*}
+      & x_{t+1}=x_t-\eta \nabla f(x_t) \text{ [normal GD]}\\
+      & \text{momentum, nesterov accel.:}\\
+      & d_{t+1} = \gamma_{t+1}(x_{t+1} - x_t)\\
+      & x_{t+1} = (x_t + d_t) - \eta \nabla f(x_t + d_t)\\
+      & \epsilon=\mathcal{O}\left(\frac{1}{T^2}\right)
+    \end{align*}
 
-  Composite function:\\
-  $\min_x f(x) = g(x) + h(x)$, $g$ smooth, $h$ not smooth but has prox. operator. Convergence due to non-smooth function: $\mathcal{O}(\frac{1}{\sqrt{T}})$
+    \vfill\null
+    \pagebreak
+    
+    \section {Common Algorithms}
 
-  \subsection{L1 regularization with subgradient descent}
-  
-  \begin{align*}
-    & \min_x \|Ax-y\|_2^2 + \labda \|x\|_1\\
-    & g=\|Ax-y\|_2^2\\
-    & h=\lambda \|x\|_1\\
-    & \partial_x h(x) = \begin{cases}
+    \subsection {Projected Gradient}
+    \begin{align*}
+      & y_{t+1} = x_t - \eta g_t, g_t \in \partial f(x_t)\\
+      & x_{t+1} = proj_{X}(y_{t+1})\\
+      & x^*=proj_{X}(x^*) \text{ [fixed point at optimality]}
+    \end{align*}
+    
+    \subsection {Proximal Gradient}
+    \begin{align*}
+      prox_{\eta h}(y) = \argmin_x h(x) + \frac{1}{2 \eta} \|x-y\|_2^2\\
+      x_{t+1} = prox_{\eta h}(x_t - \eta \nabla f(x_t))
+    \end{align*}
+    
+    Special case of projected gradient:\\
+    let $h(x)=I_X(x) \implies prox_{\eta h} = proj_X$\\
+    where $I_X(x) =
+    \begin{cases}
+      0 &, x \in X\\
+      +\infty &, o/w
+    \end{cases}$
+
+    \subsubsection{Common proximal operators}
+    $h(x) = \|x\|_1$:
+    \begin{align*}
+      (prox_{\eta h}(x))_i & = \begin{cases}
+        x_i - \eta &, x_i \geq \eta\\
+        0 &, |x_i| \leq \eta\\
+        x_i + \eta &, x_i \leq -\eta
+      \end{cases}\\
+      & = \max(|x_i|-\eta,0)\ sign(x_i)
+    \end{align*}
+    
+    $h(x)=\frac{1}{2} x^T Q x + q^T x + q_0, Q \succeq 0$:
+    \begin{align*}
+      prox_{\eta h} = (I + \eta Q)^{-1} (x- \eta q)
+    \end{align*}
+
+    $h(x)=\sum_i h_i(x_i)$:
+    \begin{align*}
+      (prox_{\eta h}(x))_i = prox_{\eta h_i}(x_i) \text{ [parallelism]}
+    \end{align*}
+
+    Composite function:\\
+    $\min_x f(x) = g(x) + h(x)$, $g$ smooth, $h$ not smooth but has prox. operator. Convergence due to non-smooth function: $\mathcal{O}(\frac{1}{\sqrt{T}})$
+
+    \subsection{L1 regularization with subgradient descent}
+    
+    \begin{align*}
+      & \min_x \|Ax-y\|_2^2 + \labda \|x\|_1\\
+      & g=\|Ax-y\|_2^2\\
+      & h=\lambda \|x\|_1\\
+      & \partial_x h(x) = \begin{cases}
+        -1 &, x_i < 0\\
+        [-1, 1] &, x_i = 0\\
+        1 &, x_i > 0
+      \end{cases}\\
+      & x_{t+1} = x_t - \eta (\nabla g(x_t) + \lambda \partial h(x))\\
+      & x_{t+1} = x_t - \eta (2A^T(Ax-y) + \lambda z)\\
+      & z=\begin{cases}
       -1 &, x_i < 0\\
-      [-1, 1] &, x_i = 0\\
+      [-1,1] &, x_i = 0\\
       1 &, x_i > 0
-    \end{cases}\\
-    & x_{t+1} = x_t - \eta (\nabla g(x_t) + \lambda \partial h(x))\\
-    & x_{t+1} = x_t - \eta (2A^T(Ax-y) + \lambda z)\\
-    & z=\begin{cases}
-    -1 &, x_i < 0\\
-    [-1,1] &, x_i = 0\\
-    1 &, x_i > 0
-    \end{cases}
-  \end{align*}
-  Convergence: $\epsilon=\mathcal{O}\left(\frac{1}{\sqrt{T}}\right)$
+      \end{cases}
+    \end{align*}
+    Convergence: $\epsilon=\mathcal{O}\left(\frac{1}{\sqrt{T}}\right)$
     
-  \subsection{ISTA (with proximal gardient)}
-  \begin{align*}
-    & \min_x g(x) + h(x), g\ \beta\text{-smooth}\\
-    & g(x) = \|Ax-y\|_2^2\\
-    & h(x) \lambda \|x\|_1\\
-    & x_{t+1} = prox_{\eta h}(x_t - \eta \nabla g(x_t))\\
-    & g\ \beta \text{-smooth, select } \eta = \frac{1}{\beta}\\
-    & x_{t+1} = prox_{\frac{1}{\beta} \lambda \|\dot\|_1}(x_t - \frac{1}{\beta} \nabla g(x_t))\\
-    & x_{t+1} = \argmin_x \lambda \|x\|_1 + \frac{\beta}{2} \|x-(x_t-\frac{1}{\beta} \nabla g(x_t))\|_2^2\\
-    & \nabla g(x_t) = 2A^T(Ax-y)
-  \end{align*}
-  Convergence: $\mathcal{O}\left(\frac{1}{\sqrt{T}}\right)
+    \subsection{ISTA (with proximal gardient)}
+    \begin{align*}
+      & \min_x g(x) + h(x), g\ \beta\text{-smooth}\\
+      & g(x) = \|Ax-y\|_2^2\\
+      & h(x) \lambda \|x\|_1\\
+      & x_{t+1} = prox_{\eta h}(x_t - \eta \nabla g(x_t))\\
+      & g\ \beta \text{-smooth, select } \eta = \frac{1}{\beta}\\
+      & x_{t+1} = prox_{\frac{1}{\beta} \lambda \|\dot\|_1}(x_t - \frac{1}{\beta} \nabla g(x_t))\\
+      & x_{t+1} = \argmin_x \lambda \|x\|_1 + \frac{\beta}{2} \|x-(x_t-\frac{1}{\beta} \nabla g(x_t))\|_2^2\\
+      & \nabla g(x_t) = 2A^T(Ax-y)
+    \end{align*}
+    Convergence: $\mathcal{O}\left(\frac{1}{\sqrt{T}}\right)
 
-  \subsection{FISTA}
-  \begin{align*}
-    & \min_x g(x) + h(x), g\ \beta\text{-smooth}\\
-    & \mu_0=0\\
-    & \mu_t = \frac{1+\sqrt{1+4\mu_t^2-1}}{2}\\
-    & \gamma_t = \frac{1-\mu_t}{\mu_{t+1}}\\
-    & x_1=z_1=\text{arbitrary}\\
-    & x_{t+1} = (1-\gamma_t) x_{t+1} + \gamma_t z_t\\
-    & z_{t+1} = prox_{\frac{\lambda}{\beta}\| \dot \|_1}(x_t - \frac{1}{\beta} \nabla g(x_t))
-  \end{align*}
-  Convergence: $\epsilon=\mathcal{O}\left(\frac{1}{T^2}\right)
+    \subsection{FISTA}
+    \begin{align*}
+      & \min_x g(x) + h(x), g\ \beta\text{-smooth}\\
+      & \mu_0=0\\
+      & \mu_t = \frac{1+\sqrt{1+4\mu_t^2-1}}{2}\\
+      & \gamma_t = \frac{1-\mu_t}{\mu_{t+1}}\\
+      & x_1=z_1=\text{arbitrary}\\
+      & x_{t+1} = (1-\gamma_t) x_{t+1} + \gamma_t z_t\\
+      & z_{t+1} = prox_{\frac{\lambda}{\beta}\| \dot \|_1}(x_t - \frac{1}{\beta} \nabla g(x_t))
+    \end{align*}
+    Convergence: $\epsilon=\mathcal{O}\left(\frac{1}{T^2}\right)
 
-  \vfill\null
-  \pagebreak
+    \vfill\null
+    \pagebreak
     
-  \section{Subgradient Method}
-  TODO
+    \section{Subgradient Method}
+    TODO
 
-  \vfill\null
-  \pagebreak
+    \vfill\null
+    \pagebreak
     
-  \section{Large Scale Optimization}
-\begin{enumerate}
-  \item memory reduction techniques with quasi-Newton methods.
-  \item Inexact Newton methods with superlinear local convergence properties, indefinite Hessian, Hessian-free impl.
-  \item function that is partial separable to use smaller subspaces.
-\end{enumerate}
+    \section{Large Scale Optimization}
+    \begin{enumerate}
+    \item memory reduction techniques with quasi-Newton methods.
+    \item Inexact Newton methods with superlinear local convergence properties, indefinite Hessian, Hessian-free impl.
+    \item function that is partial separable to use smaller subspaces.
+    \end{enumerate}
 
-  
-  \subsection{Inexact Newton Methods}
-  
-  Iterative method with local convergence properties.\\
-  Residual: $r_k = \nabla^2 f_k p_k + \nabla f_k$\\
-  Termination condition for iterative solver: $\|r_k\| \leq \eta_k \|\nabla f_k\|, \eta_k \in (0,1)$, where ${\eta_k}$ is the forcing sequence.\\
-  Convergence properties: see Thm 7.1, 7.2 (Nocedal)\\
-  
-  2 such algorithms, using CG as the iterative solver:
-  \begin{enumerate}
-  \item Line Search Newton-CG
-  \item Trust Region Newton-CG (Section \ref{section_trust_region_newton_cg})
-  \end{enumerate}
-
-  \subsubsection{Line Search Newton-CG}
-  Augment original CG algorithm with line search, curvature check and forcing function check.\\
     
-  \begin{algorithm}[H]
-    $x_0 = ..$\\
-    \For{$k=0,1,..$}{
-      \eta_k = \min(\frac{1}{2}, \| \nabla f_k\|^{\frac{1}{2}})\\
-      $z_0 = 0, r_0=\nabla f_k, d_0=-r_0=-\nabla f_k$\\
-      \For{$j=0,1,..$}{
-        //choose direction\\
-        \uIf{$d_j^T B_k d_j \leq 0$}{
-          \uIf{$j=0$}{
-            break $p_k = - \nabla f_k$
+    \subsection{Inexact Newton Methods}
+    
+    Iterative method with local convergence properties.\\
+    Residual: $r_k = \nabla^2 f_k p_k + \nabla f_k$\\
+    Termination condition for iterative solver: $\|r_k\| \leq \eta_k \|\nabla f_k\|, \eta_k \in (0,1)$, where ${\eta_k}$ is the forcing sequence.\\
+    Convergence properties: see Thm 7.1, 7.2 (Nocedal)\\
+    
+    2 such algorithms, using CG as the iterative solver:
+    \begin{enumerate}
+    \item Line Search Newton-CG
+    \item Trust Region Newton-CG (Section \ref{section_trust_region_newton_cg})
+    \end{enumerate}
+
+    \subsubsection{Line Search Newton-CG}
+    Augment original CG algorithm with line search, curvature check and forcing function check.\\
+    
+    \begin{algorithm}[H]
+      $x_0 = ..$\\
+      \For{$k=0,1,..$}{
+        \eta_k = \min(\frac{1}{2}, \| \nabla f_k\|^{\frac{1}{2}})\\
+        $z_0 = 0, r_0=\nabla f_k, d_0=-r_0=-\nabla f_k$\\
+        \For{$j=0,1,..$}{
+          //choose direction\\
+          \uIf{$d_j^T B_k d_j \leq 0$}{
+            \uIf{$j=0$}{
+              break $p_k = - \nabla f_k$
+            }
+            \Else{
+              break $p_k = z_j$
+            }
           }
-          \Else{
-            break $p_k = z_j$
+          $\alpha_j = \frac{r_j^T r_j}{d_j^T B_k d_j}$\\
+          $z_{j+1}  = z_j + \alpha_j d_j$\\
+          $r_{j+1} = r_j + \alpha_j B_k d_j$\\\
+          //forcing function constraint\\
+          \uIf{$\|r_{j+1}\| < \epsilon_k = \eta_k \|\nabla f_k\|$}{
+            break $p_k = z_{j+1}$
           }
+          $B_{j+1} = \frac{r_{j+1}^T r_{j+1}}{r_j^T r_j}$\\
+          $d_{j+1} = -r_{j+1} + B_{j+1} d_j$\\
         }
-        $\alpha_j = \frac{r_j^T r_j}{d_j^T B_k d_j}$\\
-        $z_{j+1}  = z_j + \alpha_j d_j$\\
-        $r_{j+1} = r_j + \alpha_j B_k d_j$\\\
-        //forcing function constraint\\
-        \uIf{$\|r_{j+1}\| < \epsilon_k = \eta_k \|\nabla f_k\|$}{
-          break $p_k = z_{j+1}$
-        }
-        $B_{j+1} = \frac{r_{j+1}^T r_{j+1}}{r_j^T r_j}$\\
-        $d_{j+1} = -r_{j+1} + B_{j+1} d_j$\\
-      }
-      $\alpha_k = $ Wolfe/Goldstein/Armijo step search\\
-      $x_{k+1} = x_k + \alpha_k p_k$\\
-    }\\
-    \caption{Line Search Newton-CG Algo \label{Algo_line_search_newton_cg}}
-  \end{algorithm}
+        $\alpha_k = $ Wolfe/Goldstein/Armijo step search\\
+        $x_{k+1} = x_k + \alpha_k p_k$\\
+      }\\
+      \caption{Line Search Newton-CG Algo \label{Algo_line_search_newton_cg}}
+    \end{algorithm}
 
-  \subsection{Partially Separable Functions}
-  Decompose into sum of element functions with a large number of variables being linearly independent.\\
+    \subsection{Partially Separable Functions}
+    Decompose into sum of element functions with a large number of variables being linearly independent.\\
 
-  Ideally: $\nabla f(x) = \sum_i \nabla f_i(x), \nabla^2 f(x) = \sum_i \nabla^2 f_i(x)$.\\
+    Ideally: $\nabla f(x) = \sum_i \nabla f_i(x), \nabla^2 f(x) = \sum_i \nabla^2 f_i(x)$.\\
 
-  Use Hessian approximations for individual element functions.\\ 
+    Use Hessian approximations for individual element functions.\\ 
 
-  Use chain rule to transform into msaller spaces and back to original space via compactifying matrices.\\
+    Use chain rule to transform into msaller spaces and back to original space via compactifying matrices.\\
 
-  eg: $\nabla^2 f(_1(x) \approx U_i^T B_{[1]} U_i$ mapping $B_{[1]}$ back into correct position in the full Hessian approximation.
+    eg: $\nabla^2 f(_1(x) \approx U_i^T B_{[1]} U_i$ mapping $B_{[1]}$ back into correct position in the full Hessian approximation.
 
-  \begin{align*}
-    x_{[i]} &= U_i x\\
-    f(x) &= \sum_i \phi_i(U_i x)\\
-    \nabla f_i(x) &= U_i^T \nabla \phi_i(U_i x)\\
-    \nabla^2 f_i(x) &= U_i^T \nabla^2 \phi_i(U_i x) U_i\\
-  \end{align*}
+    \begin{align*}
+      x_{[i]} &= U_i x\\
+      f(x) &= \sum_i \phi_i(U_i x)\\
+      \nabla f_i(x) &= U_i^T \nabla \phi_i(U_i x)\\
+      \nabla^2 f_i(x) &= U_i^T \nabla^2 \phi_i(U_i x) U_i\\
+    \end{align*}
 
-  Use a Quasi-Newton to approximate $\nabla^2 \phi_i$ which require smaller resources by updating a new approximation $B_{[i]}$ iteratively:
-  \begin{align*}
-    s_{[i]} & = x_{[i]}^+ - x_{[i]}\\
-    y_{[i]} & = \nabla \phi_i(x_{[i]}^+) - \nabla \phi_i(x_{[i]})\\
-    B_{[i]} & \approx \nabla^2 \phi_i(U_i x) = \nabla^2 \phi_i(x_{[i]})
-  \end{align*}
+    Use a Quasi-Newton to approximate $\nabla^2 \phi_i$ which require smaller resources by updating a new approximation $B_{[i]}$ iteratively:
+    \begin{align*}
+      s_{[i]} & = x_{[i]}^+ - x_{[i]}\\
+      y_{[i]} & = \nabla \phi_i(x_{[i]}^+) - \nabla \phi_i(x_{[i]})\\
+      B_{[i]} & \approx \nabla^2 \phi_i(U_i x) = \nabla^2 \phi_i(x_{[i]})
+    \end{align*}
 
-  Map back to place in original matrix:\\
+    Map back to place in original matrix:\\
 
-  $\nabla^2 f_i(x) \approx U_i^T B_{[i]} U_i$\\
+    $\nabla^2 f_i(x) \approx U_i^T B_{[i]} U_i$\\
 
-  Complete Hessian approximation then becomes:\\
+    Complete Hessian approximation then becomes:\\
 
-  $B = \sum_i U_i^T B_{[i]} U_i$\\
+    $B = \sum_i U_i^T B_{[i]} U_i$\\
 
-  which can be used in trust region algo to get $p_k$:\\
-  
-  $B_k p_k = -\nabla f_k$.
-
-  \vfill\null
-  \pagebreak
-
-  \section{Quadratic Programming}
-
-  TODO
-
-  \vfill\null
-  \pagebreak
-
-  \section{Sequential QP}
-
-  TODO
-
-  \vfill\null
-  \pagebreak
-  
-  \section{Nonlinear Penalty Based Methods}
-  
-  \subsection{Quadratic Penalty}
-  
-  Inexact, iterative method. Idea: add a weighted quadratic penalty term per constraint to the objective. Form a sequence of probems with increasing weights to penalty terms.\\
-  
-  $\min_x f(x)\ s.t.\ c_i(x)=0, i\in \mathcal{E}$\\
-  $Q(x;\mu) = f(x) + \frac{\mu}{2} \sum_i c_i(x)^2$\\
-  $\mu_k \rightarrow +\infty\ as\ k \rightarrow +\infty$\\
-
-  Use unconstrained optimization techniques and use previous iterate as starting point for current iteration.\\
-  
-  May diverges when penalty weight if not big enough.\\
-
-  Ill conditioning of Hessian when $\mu_k$ becomes large at the minimizer. CG and Quasi-Newton not suitable. Newton's method may still have problems: numerical inaccuracies when solving linear equations to calculate step, and Taylor series 2nd order approximation onyl accurate in a small neighbourhood of x so it may not generate useful step unless $\mu_{k+1}$ is chosen slightly larger than $\mu_k$.
-
-
-  let $A(x)^T = [\nabla c_i(x)]_{i \in \mathcal{E}}$\\
-  $Q(x; \mu_k) = f(x) + \sum_{i \in \mathcal{E}} \mu_k c_i(x_k)$\\
-  $\nabla_x Q(x; \mu_k) = \nabla f(x) + \sum_{i \in \mathcal{E}} \mu_k c_i(x_k) \nabla c_i(x_k)$\\
-  $\nabla_{xx}^2 Q(x; \mu_k) = \nabla^2 f(x) + \sum_{i \in \mathcal{E}} \mu_k c_i(x) \nabla^2 c_i(x) + \mu_k A(x)^TA(x)$\\
-  $\nabla_{xx}^2 Q(x; \mu_k) \approx \nabla_{xx}^2 L(x; \lambda^*) + \mu_k A(x)^T A(x)$ near minimizer where $\mu_k A(x)^T A(x)$ may be ill conditioned as $\mu_k \rightarrow \infty$\\
-  
-  For the case of equality and inequality constrained problem:
-  \begin{align*}
-    & \min_x f(x)\\
-    & s.t.\ c_i(x)=0, i\in \mathcal{E}\\
-    & s.t.\ c_i(x)\geq 0, i\in \mathcal{I}\\
-    & Q(x;\mu) = f(x) + \frac{\mu}{2} \sum_i c_i(x)^2 + \frac{\mu}{2} \sum_i max(-c_i(x), 0)^2
-  \end{align*}
-
-  \vfill\null
-  \columnbreak
-  
-  \begin{algorithm}[H]
-    $x_0^s = ..$\\
-    $\mu_0 > 0$\\
-    $\{\tau_k\} \rightarrow 0$\\
-    \For{$k=0,1,..$}{
-      solve $x_k = \argmin_x Q(x; \mu_k)$ with initial guess $x_k^s$ with termination condition $\|\nabla_x Q(x;\mu_k)\| \leq \tau_k$\\
-      \uIf{final convergence criteria passes}{
-        return approx solution
-      }
-      update $\mu_{k+1}: \mu_{k+1} > \mu_k$ (eg: chosen adaptively)\\
-      update $x_{k+1}^s \leftarrow x_k$
-    }\\
-    \caption{Quadratic Penalty Algo \label{Algo_quadratic_penalty}}
-  \end{algorithm}
-
-  \subsection{Nonsmooth Penalty Methods}
-
-  \subsubsection{L1 Penalty}
-  Exact method, not rely on updating stratefor penalty parameter. Penalty function:\\
-
-  $\phi(x;\mu) = f(x) + \mu \sum_{i \in \mathcal{E}}\|c_i(x)\| + \mu \sum_{i \in \mathcal{I}} \max(0, -c_i(x))$\\
-
-  If $x^*$ is a strict local minimizer then $x^*$ is a local minimizer of $\phi(x;\mu)$ for $\forall \mu > \mu^*$, where $\mu^*=||\lambda^*||_{\infty} = \max_{i \in \mathcal{I} \cup \mathcal{E}} | \lambda_i^*|$, $\lambda_i$s being lagrange multiplers. This generates enough penalization when going into infeasible resion to keep $x^*$ as local minimizer.
-
-  Nonsmooth function, but has directional derivatives $D(\phi(x;\mu);p)$ along $p$.\\
-
-  $\hat{x}$ is a stationary point for $\phi(x;\mu)$ if $D(\phi(\hat{x}, \mu); p) \geq 0, \forall p$\\
-
-  $\hat{x}$ is a stationary point of measure of infeasibility $h(x) = \sum_{i \in \mathcal{E}}|c_i(x)| + \sum_{i \in \mathcal{I}} max(0, -c_i(x))$ if $D(\phi(\hat{x}, \mu); p) \geq 0, \forall p$\\
-
-  \begin{algorithm}[H]
-    $x_0^s = ..$\\
-    $\mu_0 > 0$\\
-    $\tau = ..$\\
-    \For{$k=0,1,..$}{
-      solve approximately $x_k = \argmin_x \phi(x; \mu_k)$ with initial guess $x_k^s$
-      \uIf{$h(x_k) \leq \tau$}{
-        return $x_k$
-      }
-      update $\mu_{k+1}: \mu_{k+1} > \mu_k$\\
-      update new starting point: $x_{k+1}^s$
-    }\\
-    \caption{Classic L1 Penalty Algo \label{Algo_l1_classic_penalty}}
-  \end{algorithm}
-
-  Practical L1 penalty method: linearize constraints, replace nonlinear objective by a quadratic. Convert to a smooth QP problem by new slack variables and solve with standard QP solver.
-  \begin{align*}
-    & \min_{p,r,s,t} f(x) + \frac{1}{2} p^T W p + \nabla f(x)^T p\\
-    & + \mu \sum_{i \in \mathcal{E}} (r_i + s_i) + \mu \sum_{i \in \mathcal{I}} t_i\\
-    s.t. & \nabla c_i(x)^T p + c_i(x) = r_i - s_i, i \in \mathcal{E}\\
-    & \nabla c_i(x)^T p + c_i(x) \geq -t_i, i \in \mathcal{I}\\
-    & r,s,t \geq 0
-  \end{align*}    
-
-  Possible issue: $\mu_k$ is critical to success of iteration. Strategy: choose $\mu$ slightly larger than $\|\lambda^*\|_{\infty}$ but that depends on lagrange multipler estimate.
-  
-  \vfill\null
-  \columnbreak
+    which can be used in trust region algo to get $p_k$:\\
     
-  \subsection{Augmented Lagrangian}
-  Add estimated Lagrange multipliers term to quadratic penalty formulation. Differs from standard Lagrangian with the extra quadratic terms.\\
-  $Q(x, \lambda; \mu) = f(x) - \sum_i \lambda_i c_i(x) + \frac{\mu}{2} \sum_i c_i(x)^2, \forall i \in \mathcal{E}$\\
-  
-  Idea: fix $\mu_k, \lambda_k$ at current iteration, minimized wrt. $x$, update estimate of Lagrangian variables.
+    $B_k p_k = -\nabla f_k$.
 
-  $x_k = \argmin_x L(x, \lambda_k; \mu_k)$\\
-  Optimality condition for uncstained minimization:\\
-  $0 \approx \nabla_x L(x_k, \lambda_k; \mu_k) = \nabla f(x_k) - \sum_{i \in \mathcal{E}}(\lambda_{k,i} - \mu_k c_i(x_k)) \nabla c_i(x_k)$\\
-  $\lambda_i^* \approx \lambda_{k,i} - \mu_k c_i(x_k), \forall i \in \mathcal{E}$\\
-  Update of Lagrangian variables follow naturally.\\
-  $\lambda_{k+1,i} \leftarrow \lambda_{k,i} - \mu_k c_i(x_k), \forall i \in \mathcal{E}$\\
-  $c_i(x_k) \approx \frac{\lambda_{k,i} - \lambda_i^*}{\mu_k}$\\
-  If $\lambda_{k,i}$ close to $\lambda_i^*$, then $c_i(x_k) \ll \frac{1}{\mu_k}$, this is better than quadratic penalty method's $c_i(x_k)\approx \frac{-\lambda_i^*}{\mu_k}, \forall i \in \mathcal{E}$\\
+    \vfill\null
+    \pagebreak
 
-  Even with modest penalty weight, $\mu_k$, $c_i(x_k)$ is more like 0 which is require for optimality condition, this allows convergence without having $\mu_k \rightarrow +\infty$. Less ill conditioning and initial starting point is less critical.\\
+    \section{Quadratic Programming}
 
-  Tolerance $\tau_k$ can be chosen on infeasibility, $\sum_i |c(x_k)|$, and can be increased if infeasibility reduction in insufficient.
-  
-  \begin{algorithm}[H]
-    $x_0^s = ..$\\
-    $\lambda_0 = ..$\\
-    $\tau_0 > 0$\\
-    $\mu_0 > 0$\\
-    \For{$k=0,1,..$}{
-      solve $x_k = \argmin_x L(x, \lambda_k; \mu_k)$ starting at $x_k^s$ with termination condition $\|\nabla_x Q(x, \lambda_k;\mu_k)\| \leq \tau_k$\\
-      \uIf{$c_i(x)=0, \forall i \in \mathcal{E}$}{
-        return $x_k$
-      }
-      $\lambda_{k+1,i} \leftarrow \lambda_{k,i} - \mu_k c_i(\lambda_{k,i})\\
-      update $\mu_{k+1}: \mu_{k+1} > \mu_k$ (eg: chosen adaptively)\\
-      update $x_{k+1}^s \leftarrow x_k$\\
-      update $\tau_{k+1}^s \leftarrow ...$
-    }\\
-    \caption{Augmented Lagrangian Algo \label{Algo_augmented_lagrangian}}
-  \end{algorithm}
+    TODO
 
-  Augmented Lagrangian Approaches:
-  \begin{itemize}
-  \item Bound Constained
-  \item Linearly Constrained Lagrangian
-  \item Unconstrained
-  \end{itemize}
+    \vfill\null
+    \pagebreak
 
-  \subsubsection{Bound Constrained}
-  Introduce slack variables for inequalities, transform into equality constrained problem with variable bound constraints.\\
+    \section{Sequential QP}
 
-  $\min_x f(x),\ s.t.\ c_i(x) = 0\ \forall i,\ l \leq x \leq u$\\
-  
-  Solve the subprobem using augmented Lagrangian with nonlinear gradient probjection method by fixing $\lambda, \mu$.\\
-  $\min_x L(x, \lambda_k; \mu_k) = f(x) - \sum_i \lambda_i c_i(x) + \frac{\mu}{2}\sum_i c_i(x)^2$\\
-  
-  1st order necessary conditions for $x$:\\
-  $x - Proj_{[l,u]}(x-\nabla_x L(x,\lambda; \mu), l, u) = 0$\\
+    TODO
 
-  TODO: [insert algo 17.4 nocedal]
+    \vfill\null
+    \pagebreak
+    
+    \section{Nonlinear Penalty Based Methods}
+    
+    \subsection{Quadratic Penalty}
+    
+    Inexact, iterative method. Idea: add a weighted quadratic penalty term per constraint to the objective. Form a sequence of probems with increasing weights to penalty terms.\\
+    
+    $\min_x f(x)\ s.t.\ c_i(x)=0, i\in \mathcal{E}$\\
+    $Q(x;\mu) = f(x) + \frac{\mu}{2} \sum_i c_i(x)^2$\\
+    $\mu_k \rightarrow +\infty\ as\ k \rightarrow +\infty$\\
 
-  \subsubsection{Linearly Constrained Lagrangian}
-  Idea: lienarize constraints and generate a step by minimizing Lagragian.
-  \begin{align*}
-    & \min_x F_k(x) = f(x) - \sum_i \lambda_i^k \bar{c}_i^k(x) + \frac{\mu}{2} \sum_i [\bar{c}_i^k(x)]^2\\
-    s.t.\ & c(x_k) + A_k(x-x_k)=0\\
-    & \bar{c}_i^k(x) = c_i(x) - (c_i(x_k) + \nabla c_i(x_k)^T (x-x_k))\\
-    & l \leq x \leq u
-  \end{align*}
+    Use unconstrained optimization techniques and use previous iterate as starting point for current iteration.\\
+    
+    May diverges when penalty weight if not big enough.\\
 
-  where $A_k$ is the constraint Jacobian.\\
+    Ill conditioning of Hessian when $\mu_k$ becomes large at the minimizer. CG and Quasi-Newton not suitable. Newton's method may still have problems: numerical inaccuracies when solving linear equations to calculate step, and Taylor series 2nd order approximation onyl accurate in a small neighbourhood of x so it may not generate useful step unless $\mu_{k+1}$ is chosen slightly larger than $\mu_k$.
 
-  \subsubsection{Unconstrained}
-  Idea: use proximal point approach for inequality constrained problems.
-  \begin{align*}
-    \min_x F(x) & = \max_{\lambda \geq 0} \{f(x) - \sum_{i \in \mathcal{I}} \lambda_i c_i(x) \} \\
-    &= \begin{cases}
+
+    let $A(x)^T = [\nabla c_i(x)]_{i \in \mathcal{E}}$\\
+    $Q(x; \mu_k) = f(x) + \sum_{i \in \mathcal{E}} \mu_k c_i(x_k)$\\
+    $\nabla_x Q(x; \mu_k) = \nabla f(x) + \sum_{i \in \mathcal{E}} \mu_k c_i(x_k) \nabla c_i(x_k)$\\
+    $\nabla_{xx}^2 Q(x; \mu_k) = \nabla^2 f(x) + \sum_{i \in \mathcal{E}} \mu_k c_i(x) \nabla^2 c_i(x) + \mu_k A(x)^TA(x)$\\
+    $\nabla_{xx}^2 Q(x; \mu_k) \approx \nabla_{xx}^2 L(x; \lambda^*) + \mu_k A(x)^T A(x)$ near minimizer where $\mu_k A(x)^T A(x)$ may be ill conditioned as $\mu_k \rightarrow \infty$\\
+    
+    For the case of equality and inequality constrained problem:
+    \begin{align*}
+      & \min_x f(x)\\
+      & s.t.\ c_i(x)=0, i\in \mathcal{E}\\
+      & s.t.\ c_i(x)\geq 0, i\in \mathcal{I}\\
+      & Q(x;\mu) = f(x) + \frac{\mu}{2} \sum_i c_i(x)^2 + \frac{\mu}{2} \sum_i max(-c_i(x), 0)^2
+    \end{align*}
+
+    \vfill\null
+    \columnbreak
+    
+    \begin{algorithm}[H]
+      $x_0^s = ..$\\
+      $\mu_0 > 0$\\
+      $\{\tau_k\} \rightarrow 0$\\
+      \For{$k=0,1,..$}{
+        solve $x_k = \argmin_x Q(x; \mu_k)$ with initial guess $x_k^s$ with termination condition $\|\nabla_x Q(x;\mu_k)\| \leq \tau_k$\\
+        \uIf{final convergence criteria passes}{
+          return approx solution
+        }
+        update $\mu_{k+1}: \mu_{k+1} > \mu_k$ (eg: chosen adaptively)\\
+        update $x_{k+1}^s \leftarrow x_k$
+      }\\
+      \caption{Quadratic Penalty Algo \label{Algo_quadratic_penalty}}
+    \end{algorithm}
+
+    \subsection{Nonsmooth Penalty Methods}
+
+    \subsubsection{L1 Penalty}
+    Exact method, not rely on updating stratefor penalty parameter. Penalty function:\\
+
+    $\phi(x;\mu) = f(x) + \mu \sum_{i \in \mathcal{E}}\|c_i(x)\| + \mu \sum_{i \in \mathcal{I}} \max(0, -c_i(x))$\\
+
+    If $x^*$ is a strict local minimizer then $x^*$ is a local minimizer of $\phi(x;\mu)$ for $\forall \mu > \mu^*$, where $\mu^*=||\lambda^*||_{\infty} = \max_{i \in \mathcal{I} \cup \mathcal{E}} | \lambda_i^*|$, $\lambda_i$s being lagrange multiplers. This generates enough penalization when going into infeasible resion to keep $x^*$ as local minimizer.
+
+    Nonsmooth function, but has directional derivatives $D(\phi(x;\mu);p)$ along $p$.\\
+
+    $\hat{x}$ is a stationary point for $\phi(x;\mu)$ if $D(\phi(\hat{x}, \mu); p) \geq 0, \forall p$\\
+
+    $\hat{x}$ is a stationary point of measure of infeasibility $h(x) = \sum_{i \in \mathcal{E}}|c_i(x)| + \sum_{i \in \mathcal{I}} max(0, -c_i(x))$ if $D(\phi(\hat{x}, \mu); p) \geq 0, \forall p$\\
+
+    \begin{algorithm}[H]
+      $x_0^s = ..$\\
+      $\mu_0 > 0$\\
+      $\tau = ..$\\
+      \For{$k=0,1,..$}{
+        solve approximately $x_k = \argmin_x \phi(x; \mu_k)$ with initial guess $x_k^s$
+        \uIf{$h(x_k) \leq \tau$}{
+          return $x_k$
+        }
+        update $\mu_{k+1}: \mu_{k+1} > \mu_k$\\
+        update new starting point: $x_{k+1}^s$
+      }\\
+      \caption{Classic L1 Penalty Algo \label{Algo_l1_classic_penalty}}
+    \end{algorithm}
+
+    Practical L1 penalty method: linearize constraints, replace nonlinear objective by a quadratic. Convert to a smooth QP problem by new slack variables and solve with standard QP solver.
+    \begin{align*}
+      & \min_{p,r,s,t} f(x) + \frac{1}{2} p^T W p + \nabla f(x)^T p\\
+      & + \mu \sum_{i \in \mathcal{E}} (r_i + s_i) + \mu \sum_{i \in \mathcal{I}} t_i\\
+      s.t. & \nabla c_i(x)^T p + c_i(x) = r_i - s_i, i \in \mathcal{E}\\
+      & \nabla c_i(x)^T p + c_i(x) \geq -t_i, i \in \mathcal{I}\\
+      & r,s,t \geq 0
+    \end{align*}    
+
+    Possible issue: $\mu_k$ is critical to success of iteration. Strategy: choose $\mu$ slightly larger than $\|\lambda^*\|_{\infty}$ but that depends on lagrange multipler estimate.
+    
+    \vfill\null
+    \columnbreak
+    
+    \subsection{Augmented Lagrangian}
+    Add estimated Lagrange multipliers term to quadratic penalty formulation. Differs from standard Lagrangian with the extra quadratic terms.\\
+    $Q(x, \lambda; \mu) = f(x) - \sum_i \lambda_i c_i(x) + \frac{\mu}{2} \sum_i c_i(x)^2, \forall i \in \mathcal{E}$\\
+    
+    Idea: fix $\mu_k, \lambda_k$ at current iteration, minimized wrt. $x$, update estimate of Lagrangian variables.
+
+    $x_k = \argmin_x L(x, \lambda_k; \mu_k)$\\
+    Optimality condition for uncstained minimization:\\
+    $0 \approx \nabla_x L(x_k, \lambda_k; \mu_k) = \nabla f(x_k) - \sum_{i \in \mathcal{E}}(\lambda_{k,i} - \mu_k c_i(x_k)) \nabla c_i(x_k)$\\
+    $\lambda_i^* \approx \lambda_{k,i} - \mu_k c_i(x_k), \forall i \in \mathcal{E}$\\
+    Update of Lagrangian variables follow naturally.\\
+    $\lambda_{k+1,i} \leftarrow \lambda_{k,i} - \mu_k c_i(x_k), \forall i \in \mathcal{E}$\\
+    $c_i(x_k) \approx \frac{\lambda_{k,i} - \lambda_i^*}{\mu_k}$\\
+    If $\lambda_{k,i}$ close to $\lambda_i^*$, then $c_i(x_k) \ll \frac{1}{\mu_k}$, this is better than quadratic penalty method's $c_i(x_k)\approx \frac{-\lambda_i^*}{\mu_k}, \forall i \in \mathcal{E}$\\
+
+    Even with modest penalty weight, $\mu_k$, $c_i(x_k)$ is more like 0 which is require for optimality condition, this allows convergence without having $\mu_k \rightarrow +\infty$. Less ill conditioning and initial starting point is less critical.\\
+
+    Tolerance $\tau_k$ can be chosen on infeasibility, $\sum_i |c(x_k)|$, and can be increased if infeasibility reduction in insufficient.
+    
+    \begin{algorithm}[H]
+      $x_0^s = ..$\\
+      $\lambda_0 = ..$\\
+      $\tau_0 > 0$\\
+      $\mu_0 > 0$\\
+      \For{$k=0,1,..$}{
+        solve $x_k = \argmin_x L(x, \lambda_k; \mu_k)$ starting at $x_k^s$ with termination condition $\|\nabla_x Q(x, \lambda_k;\mu_k)\| \leq \tau_k$\\
+        \uIf{$c_i(x)=0, \forall i \in \mathcal{E}$}{
+          return $x_k$
+        }
+        $\lambda_{k+1,i} \leftarrow \lambda_{k,i} - \mu_k c_i(\lambda_{k,i})\\
+        update $\mu_{k+1}: \mu_{k+1} > \mu_k$ (eg: chosen adaptively)\\
+        update $x_{k+1}^s \leftarrow x_k$\\
+        update $\tau_{k+1}^s \leftarrow ...$
+      }\\
+      \caption{Augmented Lagrangian Algo \label{Algo_augmented_lagrangian}}
+    \end{algorithm}
+
+    Augmented Lagrangian Approaches:
+    \begin{itemize}
+    \item Bound Constained
+    \item Linearly Constrained Lagrangian
+    \item Unconstrained
+    \end{itemize}
+
+    \subsubsection{Bound Constrained}
+    Introduce slack variables for inequalities, transform into equality constrained problem with variable bound constraints.\\
+
+    $\min_x f(x),\ s.t.\ c_i(x) = 0\ \forall i,\ l \leq x \leq u$\\
+    
+    Solve the subprobem using augmented Lagrangian with nonlinear gradient probjection method by fixing $\lambda, \mu$.\\
+    $\min_x L(x, \lambda_k; \mu_k) = f(x) - \sum_i \lambda_i c_i(x) + \frac{\mu}{2}\sum_i c_i(x)^2$\\
+    
+    1st order necessary conditions for $x$:\\
+    $x - Proj_{[l,u]}(x-\nabla_x L(x,\lambda; \mu), l, u) = 0$\\
+
+    TODO: [insert algo 17.4 nocedal]
+
+    \subsubsection{Linearly Constrained Lagrangian}
+    Idea: lienarize constraints and generate a step by minimizing Lagragian.
+    \begin{align*}
+      & \min_x F_k(x) = f(x) - \sum_i \lambda_i^k \bar{c}_i^k(x) + \frac{\mu}{2} \sum_i [\bar{c}_i^k(x)]^2\\
+      s.t.\ & c(x_k) + A_k(x-x_k)=0\\
+      & \bar{c}_i^k(x) = c_i(x) - (c_i(x_k) + \nabla c_i(x_k)^T (x-x_k))\\
+      & l \leq x \leq u
+    \end{align*}
+
+    where $A_k$ is the constraint Jacobian.\\
+
+    \subsubsection{Unconstrained}
+    Idea: use proximal point approach for inequality constrained problems.
+    \begin{align*}
+      \min_x F(x) & = \max_{\lambda \geq 0} \{f(x) - \sum_{i \in \mathcal{I}} \lambda_i c_i(x) \} \\
+      &= \begin{cases}
         f(x) &, if\ x\ feasible\\
         \infty &, o/w
-    \end{cases}
-  \end{align*}
-  
-  \begin{align*}
-    \begin{cases}
-      x\ \text{feasible} &, (c_i(x)<0),\ select\ \lambda_i\ large,\ \lambda_j = 0, \forall j \neq i\\
-      & \implies F(x) \rightarrow \infty\\
-      x\ \text{infeasible} &, (c_i(x) \geq 0), \forall i \in \mathcal{I},\ select\ (\forall i \in \mathcal{I})\lambda_i= 0\\
-      & \implies F(x) = f(x)
-    \end{cases}
-  \end{align*}
+      \end{cases}
+    \end{align*}
+    
+    \begin{align*}
+      \begin{cases}
+        x\ \text{feasible} &, (c_i(x)<0),\ select\ \lambda_i\ large,\ \lambda_j = 0, \forall j \neq i\\
+        & \implies F(x) \rightarrow \infty\\
+        x\ \text{infeasible} &, (c_i(x) \geq 0), \forall i \in \mathcal{I},\ select\ (\forall i \in \mathcal{I})\lambda_i= 0\\
+        & \implies F(x) = f(x)
+      \end{cases}
+    \end{align*}
 
-  Then $\min_x F(x) = \min_{x\ feasible} f(x)$\\
+    Then $\min_x F(x) = \min_{x\ feasible} f(x)$\\
 
-  Use an approximation $\hat{F}(x; \lambda^k, \mu_k)$ to $F$ that is smooth for practical optimization:
+    Use an approximation $\hat{F}(x; \lambda^k, \mu_k)$ to $F$ that is smooth for practical optimization:
 
-  $\hat{F}(x; \lambda_^, \mu_k) = \max_{\lambda \geq o} \{ f(x) - \sum_{i \in \mathcal{I}} \lambda_i c_i(x) - \frac{1}{2 \mu_k} \sum_{i \in \mathcal{I}}(\lambda_i - \lambda_i^k)^2 \}$\\
+    $\hat{F}(x; \lambda_^, \mu_k) = \max_{\lambda \geq o} \{ f(x) - \sum_{i \in \mathcal{I}} \lambda_i c_i(x) - \frac{1}{2 \mu_k} \sum_{i \in \mathcal{I}}(\lambda_i - \lambda_i^k)^2 \}$\\
 
-  This is a bound constrained quadratic program in $lambda$, separable in individual components $\lambda_i$. The additional proximal term helps staying close to $\lambda_i^k$.\\
+    This is a bound constrained quadratic program in $lambda$, separable in individual components $\lambda_i$. The additional proximal term helps staying close to $\lambda_i^k$.\\
 
-  We perform maximization explicitly:\\
-  
-  $\lambda_i = \begin{cases}
-    0 &, -c_i(x) + \frac{\lambda_i^k}{\mu_k} \leq 0\\
-    \lambda_i^k - \mu_k c_i(x) &, o/w
-  \end{cases}$
+    We perform maximization explicitly:\\
+    
+    $\lambda_i = \begin{cases}
+      0 &, -c_i(x) + \frac{\lambda_i^k}{\mu_k} \leq 0\\
+      \lambda_i^k - \mu_k c_i(x) &, o/w
+    \end{cases}$
 
-  Substitute $\lambda_i$ back in $\hat{F}$:\\
-  
-  $\hat{F}(x; \lambda^k, \mu_k) = f(x) + \sum_{i \in \mathcal{I}} \psi(c_i(x), \lambda_i^k; \mu_k)$\\
-  
-  $\psi(t,\sigma; \mu) = \begin{cases}
-    - \sigma t + \frac{\mu}{2} t^2 &, t - \frac{\sigma}{\mu} \leq 0\\
-    - \frac{1}{2} \mu} \sigma^2} &, o/w
-  \end{cases}$
+    Substitute $\lambda_i$ back in $\hat{F}$:\\
+    
+    $\hat{F}(x; \lambda^k, \mu_k) = f(x) + \sum_{i \in \mathcal{I}} \psi(c_i(x), \lambda_i^k; \mu_k)$\\
+    
+    $\psi(t,\sigma; \mu) = \begin{cases}
+      - \sigma t + \frac{\mu}{2} t^2 &, t - \frac{\sigma}{\mu} \leq 0\\
+      - \frac{1}{2} \mu} \sigma^2} &, o/w
+    \end{cases}$
 
-  New iterate $x_k$ is found by minimizing $\hat{F}$:\\
+    New iterate $x_k$ is found by minimizing $\hat{F}$:\\
 
-  $x_K = \argmin_x \hat{F}(x; \lambda_k, \mu_k)$\\
+    $x_K = \argmin_x \hat{F}(x; \lambda_k, \mu_k)$\\
 
-  New Lagrangian multiplier update rule:\\
-  
-  $\lambda_i^{k+1} = \begin{cases}
-    0 &, -c_i(x) + \frac{\lambda_i^k}{\mu_k} \leq 0\\
-    \lambda_i^k - \mu_k c_i(x) &, o/w
+    New Lagrangian multiplier update rule:\\
+    
+    $\lambda_i^{k+1} = \begin{cases}
+      0 &, -c_i(x) + \frac{\lambda_i^k}{\mu_k} \leq 0\\
+      \lambda_i^k - \mu_k c_i(x) &, o/w
     \end{cases}$
     
-  \vfill\null
-  \pagebreak
+    \vfill\null
+    \pagebreak
 
-  \section{Factorization}
-  TODO
-  
-  \end{multicols*}
+    \section{Linear System, Iterative}
+
+    \subsection{Idea}
+    Solve $Ax=b$\\
+    Idea: split $A$ into $M+N$ and use back/forward substitutions to solve:\\
+    $Mx^{k+1}=Nx^k+b$
+    
+    \subsection{Jacobi}
+    \subsubsection{Splitting}
+    \begin{align*}
+      A &= M-N\\
+      M &= D = Diagonal\\
+      N &= M - A = D - A = -(L+U)\\
+      L &= \text{Lower left}\\
+      U &= \text{Upper right}\\
+      (M-N)x &= b\\
+      Mx &= Nx + b\\
+      Dx &= -(L+U)x + b\\
+      x &= D^{-1}(b -(L+U)x)
+    \end{align*}
+
+    \subsubsection{Algo}
+    \begin{align*}    
+      x^{k+1} &= D^{-1}(b -(L+U)x^k)
+    \end{align*}
+    
+    \subsection{Gauss-Seidel}
+    Use most recently updated values
+    \subsubsection{Splitting}
+    \begin{align*}
+      A &= M-N\\
+      M &= D + L\\
+      N &= -U\\
+      Mx &= Nx +b\\
+      (D+L)x &= -Ux + b\\
+      x &=  (D+L)^{-1}(b -Ux)
+    \end{align*}
+
+    \vfill\null
+    \columnbreak
+        
+    \subsubsection{Algo}
+    \begin{align*}
+      x^{k+1} &=  (D+L)^{-1}(b -Ux^k)\\
+      (D+L) x^{k+1} &= (b -Ux^k)\\
+      (I+D^{-1}L) x^{k+1} &= D^{-1} (b -Ux^k)\\
+      x^{k+1} &= D^{-1} (b -Ux^k) - D^{-1}L x^{k+1}\\
+      x^{k+1} &= D^{-1} (b - L x^{k+1} - Ux^k)\\
+      (\forall i)\ x_i^{k+1} & \leftarrow \frac{1}{A_{ii}} \left(b_i - \sum_{j<i} A_{ij} x_j^{k+1} - \sum_{j>i} A_{ij} x_j^k\right)
+    \end{align*}
+    
+    \subsection{SOR(Successive Over-Relaxation)}
+    \begin{align*}
+      & x^{k+1} \leftarrow x^k + w (x_{GS}^{k+1} - x^k)\\
+      & x^{k+1} \leftarrow (1-w) x^k + w x_{GS}^{k+1}\\
+      &\begin {cases}
+        w > 1 &, \text{over-relaxation}\\
+        w \in (0,1) &, \text{under-relaxation}\\
+        w = 1 &, \text{Gauss-Seidel}
+      \end {cases}
+    \end{align*}
+
+    \subsubsection{Splitting}
+    \begin{align*}
+      & A = M - N\\
+      & M = \frac{1}{w} D + L\\
+      & N = (\frac{1}{w} - 1)D - U\\
+      & Mx = Nx + b\\
+      & x = M^{-1}(Nx + b)\\
+      & (\frac{1}{w} D + L)x^{k+1} = ((\frac{1}{w}-1) D - U) w^k +b\\
+      & x^{k+1} = (D+wL)^{-1} (((1-w)D - wU)x^k + wb)
+    \end{align*}
+
+    \subsubsection{Algo}
+    \begin{align*}
+      & (\frac{1}{w} D + L)x^{k+1} = ((\frac{1}{w}-1) D - U) w^k +b\\
+      & (\frac{1}{w}I + D^{-1}L)x^{k+1} = ((\frac{1}{w} - 1)I - D^{-1}U)x^k + D^{-1}b\\
+      & \frac{1}{w}x^{k+1} = -D^{-1}L x^{k+1} + ((\frac{1}{w} - 1)I - D^{-1}U)x^k + D^{-1}b\\
+      & x^{k+1} = w(D^{-1}(b-Lx^{k+1}-Ux^k)+(\frac{1}{w}-1)x^k)\\
+      & x^{k+1} = wD^{-1}(b-Lx^{k+1}-Ux^k)+(1-w)x^k\\
+      & x^{k+1} = w x^{k+1}_{Gauss-Seidel} + (1-w)x^k
+    \end{align*}
+    
+    \vfill\null
+    \pagebreak
+    
+    \section{Factorization}
+    
+    \subsection{LU}
+    TODO
+    
+    \subsection{QR}
+    $A = QR$\\
+    $A = \begin{bmatrix} Q_1 &Q_2 \end{bmatrix} \begin{bmatrix} R\\0 \end{bmatrix}$\\
+    $Q$: m x m, orthogonal\\
+    $R$: n x n, upper triangular\\
+    m \geq n\\
+
+    Reduced QR factorization of A:\\
+    $A = Q_1 R$\\
+    $Q_1$: m x n\\
+    $R$: n x n, upper triangular\\
+
+    $Ax = b$\\
+    $Q_1 R x = b$\\
+    $Rx = Q_1^{-1} b = Q_1^T b$\\
+    solve via subsubstitution for x\\
+
+    \subsection{Least Squares Problem}
+    Orthogonal matrix is norm preserving for $L2$:\\
+    $\|Qx\|_2^2 = x^T Q^T Q x = x^T x = \|x\|_2^2$
+    \begin{align*}
+      & Ax=b\\
+      & r = b-Ax\\
+      & \|r\|_2^2 = \|b-Ax\|_2^2\\
+      & \|r\|_2^2 = \|b-Q \begin{bmatrix} R \\ 0\end{bmatrix}x\|_2^2\\
+      & \|r\|_2^2 = \|Q^Tb - Q^T Q \begin{bmatrix} R \\ 0\end{bmatrix}x\|_2^2\\
+      & \|r\|_2^2 = \|Q^Tb - I\begin{bmatrix} R \\ 0\end{bmatrix}x\|_2^2\\
+      & Q^T b = \begin{bmatrix} c_1 \\ c_2 \end{bmatrix}\\
+      & \|r\|_2^2 = \|c_1 - Rx\|_2^2 + \|c_2\|_2^2\\
+    \end{align*}
+
+    Solve $c_1 - Rx=0 \implies \|r\|_2^2 = \|c_2\|^2$
+    
+    \subsubsection{Householder Reflection Method}
+    Idea: relfect vector so all coordinates but one disappear\\
+
+    let $| \alpha | = \|x\|_2$\\
+    $u \leftarrow x - \alpha e_1$\\
+    $v = \frac{u}{\|u\|}$\\
+    $Q = I - 2 vv^T$
+    \begin{align*}
+      & (I - 2 \frac{vv^t}{v^Tv}) (I - 2 \frac{vv^t}{v^Tv})^T\\
+      & = (I - 2 \frac{vv^t}{v^Tv}) (I - 2 \frac{vv^t}{v^Tv})\\    
+      & = I - 4 \frac{vv^t}{v^Tv} + 4 \frac{vv^t vv^T}{v^Tv v^Tv}\\
+      & = I - 4 \frac{vv^t}{v^Tv} + 4 \frac{vv^t}{v^Tv}\\
+      & = I\\
+      & \implies (I - 2 \frac{vv^t}{v^Tv})\ \text{orthongal, symmetric}
+    \end{align*}
+    
+    $Q^T = Q^{-1} = Q$\\
+    
+    $Qx = \begin{bmatrix} \alpha \\ 0 \\ ..\\ 0 \end{bmatrix}$\\
+
+    $A$: m x n, $m \geq n$\\
+    
+    $ Q_1 A =
+    \begin{bmatrix}
+      \alpha_1 & .. \\
+      0 & A'
+    \end{bmatrix}$\\
+
+    $ Q_x =
+    \begin{bmatrix}
+      I_{k-1} & 0 \\
+      0 & Q_k'
+    \end{bmatrix}$\\    
+
+    Transform to upper triangular matrix:\\
+    $R = Q_t .. Q_1 A$\\
+    $(Q_t .. Q_1)^T R = (Q_t .. Q_1)^T (Q_t .. Q_1) A$\\
+    let $Q = (Q_t .. Q_1)^T = (Q_1 .. Q_t)$\\
+    $Q R = Q Q^T A$\\
+    $QR = (Q_1 .. Q_t) R = A$\\
+
+    Solve $Ax=b$\\
+    $QRx = b$\\
+    $Rx = Q^{-1}b$\\
+    $Rx = Q^T b$\\
+    $Rx = (Q_1 .. Q_t)^T b$\\    
+    $Rx = (Q_t^T .. Q_1^T) b$\\
+    $Rx = (Q_t .. Q_1) b$\\
+    Solve with backsubstitution\\
+
+    \vfill\null
+    \pagebreak
+    
+    \section{Eigenvalues & Eigenvectors}
+    
+    \subsection{Power Iteration}
+    TODO
+    
+    \subsection{QR Iteration}
+    TODO
+    
+\end{multicols*}
 \end {document}
 
 
