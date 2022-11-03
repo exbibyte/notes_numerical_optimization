@@ -1672,7 +1672,63 @@
     \pagebreak
     
     \section{Eigenvalues & Eigenvectors}
+
+    \subsection{Power Iteration}
+
+    $x_k = A x_{k-1} = A^k x_0$\\
+    $x_k = A^k \sum_j \alpha_j v_j$\\
+    $x_k = \sum_j \alpha_j A^k v_j$\\
+    $x_k = \sum_j \alpha_j \lambda_j^k v_j$\\
+    $x_k = \alpha_1 \lambda_1^k v_1 + \sum_{j\neq1} \alpha_j \lambda_j^k v_j$\\
+    $x_k = \lambda_1^k (\alpha_1 v_1 + \sum_{j\neq1} \alpha_j \frac{\lambda_j^k}{\lambda_1^k} v_j$\\
+    $\lim_{k \rightarrow \infty} |(\frac{\lambda_j}{\lambda_1})^k| \rightarrow 0$\\
+    $\lim_{k \rightarrow \infty} x_k = \lambda_1^k \alpha_1 v_1$
+
+    \begin{algorithm}[H]
+      let $x_0 \leftarrow ...$\\
+      \For{$k=0..$}{
+        $y_{k+1} = A x_k$\\
+        $x_{k+1} = \frac{y_{k+1}}{\|y_{k+1}\|_{\infty}}$ //normalize
+      }\\
+      \caption{Power Iteration Algo \label{Algo_power_iteration}}
+    \end{algorithm}
+    Issue: failure to converge to linear comb. of eigenvectors corresponding to same eigenvalue.\\
+
+    \subsection{Inverse Iteration}
+    Inverse iteration: use factorization and $eig(A^{-1}) = \frac{1}{eig(A)}$\\
     
+    For computing smallest eigenvalue:
+    
+    \begin{algorithm}[H]
+      let $x_0 \leftarrow ...$\\
+      \For{$k=0..$}{
+        Solve for $y_{k+1}$ with factorization:\\
+        $A y_{k+1} = x_k$\\
+        $x_{k+1} = \frac{y_{k+1}}{\|y_{k+1}\|_{\infty}}$ //normalize
+      }\\
+      \caption{Inverse Iteration \label{Algo_inverse_iteration}}
+    \end{algorithm}
+    converge to eigenvector corresponding to smallest eigenvalue of $A$ = largest eigenvalue of $A^{-1}$\\
+
+    \vfill\null
+    \columnbreak
+        
+    \subsection{Shifting}
+    Rayleigh Quotient for better eigenvalue estimation:\\
+    $\lambda = \frac{x^T A x}{x^T x}$\\
+    $\sigma_{smallest}(A-\sigma I) = \lambda - \sigma$, $\lambda$: eigenvalue of $A$ closest to $\sigma$\\
+    use eigenvalue estimate from Rayleigh Quotient in inverse iteration to get better eigenvector\\
+    
+    \begin{algorithm}[H]
+      let $x_0 \leftarrow$ guess of eigenvector\\
+      \For{$k=0..$}{
+        $\sigma_{k+1} = \frac{x_k^T A x_k}{x_k^T x_k}$//shift\\
+        solve $y_{k+1}$: $(A-\sigma_{k+1}I)y_{k+1} = x_k$//next vector iterate\\
+        $x_{k+1} = \frac{y_{k+1}}{\|y_{k+1}\|_{\infty}}$//normalize\\
+      }\\
+      \caption{Inverse Iteration with Shifting \label{Algo_inverse_iteration_shifting}}
+    \end{algorithm}        
+        
     \subsection{Simultaneous Iteration}
     
     \begin{algorithm}[H]
@@ -1704,9 +1760,8 @@
     $\hat{Q}_k:  n \times p$ orthogonal\\
     $R_k:  p \times p$ upper triangle\\
 
-%%     \vfill\null
-%%     \columnbreak
-       
+    \vfill\null
+    \pagebreak
     
     \subsection{QR Iteration}
     Reference: section 4.5.6 from Heath\\
@@ -1715,6 +1770,7 @@
     $B$ triangular\\
 
     Define $A_k = \hat{Q}_k^H A \hat{Q}_k$\\
+    $\hat{Q}_k$ orthogonal $\implies$ $\sigma(A) = \sigma(\hat{Q}_k^H A \hat{Q}_k)$\\
     $\hat{Q}_k A_k = A \hat{Q}_k$\\
     $A \hat{Q}_k = \hat{Q}_k A_k$\\
     $A_k$ triangular / block triangular when it converges\\
@@ -1770,7 +1826,7 @@
     ...\\
 
     Thus $X_k$, and factoriaztion $\hat{Q}_k R_k = X_k$ is not calculated.\\
-    Convergence is checked on $A_k$ for (block) triangular form.\\
+    Convergence is checked on $A_k$ for (block) triangular form, in which the eigenvalues can be read off.\\
     
     \begin{algorithm}[H]
       let $A_0 = A$\\
