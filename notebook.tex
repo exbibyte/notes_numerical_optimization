@@ -5,6 +5,7 @@
 \usepackage{amsmath,amsfonts,amsthm,bm}
 \usepackage{breqn}
 \usepackage{amsmath}
+\usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{tikz}
 \usepackage[ruled,vlined,linesnumbered,lined,boxed,commentsnumbered]{algorithm2e}
@@ -1672,12 +1673,114 @@
     
     \section{Eigenvalues & Eigenvectors}
     
-    \subsection{Power Iteration}
-    TODO
+    \subsection{Simultaneous Iteration}
+    
+    \begin{algorithm}[H]
+      let $X_0$: $n \times p$ matrix of rank $p$ (columns of linearly independent vectors)\\
+      \For{$k=1..$}{
+        $X_k = A X_{k-1}$\\
+      }\\
+      \caption{Simultaneous Iteration Algo \label{Algo_simultaneous_iteration}}
+    \end{algorithm}    
+
+    let $S_0 = span(X_0)$\\
+    $S \coloneqq$ invariant subspace spanned by $p$ eigenvectors associated with largest eigenvalues of A.\\
+    $S_k = A^k S_0$\\
+    columns of $X_k$ form a basis for $S_k$\\
+    $S_k \rightarrow S$\\
+
+    Issue: $X_k$ beomes ill-conditioned bassi for subspace $S_k$.\\
+    One solution: apply normalization such as QR factorization of columns of $X_k$:
+    
+    \begin{algorithm}[H]
+      let $X_0$: $n \times p$ matrix of rank $p$ (columns of linearly independent vectors)\\
+      \For{$k=1..$}{
+        $\hat{Q}_k R_k = X_{k-1}$ //normalize\\
+        $X_k = A \hat{Q}_k$ //gen next iterate\\
+      }\\
+      \caption{Orthogonal Iteration Algo \label{Algo_orthogonal_iteration}}
+    \end{algorithm}
+
+    $\hat{Q}_k:  n \times p$ orthogonal\\
+    $R_k:  p \times p$ upper triangle\\
+
+%%     \vfill\null
+%%     \columnbreak
+       
     
     \subsection{QR Iteration}
-    TODO
+    Reference: section 4.5.6 from Heath\\
     
+    $A\hat{Q} = \hat{Q}B$\\
+    $B$ triangular\\
+
+    Define $A_k = \hat{Q}_k^H A \hat{Q}_k$\\
+    $\hat{Q}_k A_k = A \hat{Q}_k$\\
+    $A \hat{Q}_k = \hat{Q}_k A_k$\\
+    $A_k$ triangular / block triangular when it converges\\
+
+    Avoiding explicit computation of $X_k$ and its factorization $\hat{Q}_k R_k = X_k$:\\
+    let $X_0 = I$\\
+    factorize: $\hat{Q}_0 R_0 = X_0$\\
+    $\hat{Q}_0 = R_0 = I$\\
+    $X_1 = A \hat{Q}_0 = A I = A$\\
+    factorize: $\hat{Q}_1 R_1 = X_1 = A$\\
+    using $A_k = \hat{Q}_k^H A \hat{Q}_k$:\\
+    $A_1 = \hat{Q}_1^H A \hat{Q}_1$\\
+    $A_1 = \hat{Q}_1^H \hat{Q}_1 R_1 \hat{Q}_1$, where $\hat{Q}_1 R_1 = A$\\
+    $A_1 = R_1 \hat{Q}_1$ (notice reverse of $\hat{Q}_1 R_1 = A$)\\
+    $X_2 = A \hat{Q}_1$\\
+   
+    $X_2 = \hat{Q}_1 \hat{Q}_1^H A \hat{Q}_1$\\
+    $X_2 = \hat{Q}_1 A_1$\\
+
+    instead of factorizing: $\hat{Q}_2 R_2 = X_2 = A \hat{Q}_1$\\
+    factorize this: $Q_2 R_2 = A_1$:\\
+    $X_2 = \hat{Q}_1 Q_2 R_2$\\
+    let $\hat{Q}_2 = \hat{Q}_1 Q_2$\\
+    $X_2 = \hat{Q}_2 R_2$\\
+
+    $A_2 = \hat{Q}_2^H A \hat{Q}_2$\\
+    $A_2 = \hat{Q}_2^H \hat{Q}_1 R_1 \hat{Q}_2$, where $A = \hat{Q}_1 R_1$\\
+    since $\hat{Q}_2 = \hat{Q}_1 Q_2$\\
+    $A_2 = Q_2^H \hat{Q}_1^H \hat{Q}_1 R_1 \hat{Q}_1 Q_2$\\
+    $A_2 = Q_2^H R_1 \hat{Q}_1 Q_2$\\    
+    since $R_1 \hat{Q}_1 = A_1$\\
+    $A_2 = Q_2^H A_1 Q_2$\\
+    since $Q_2 R_2 = A_1$\\
+    $A_2 = Q_2^H Q_2 R_2 Q_2$\\
+    $A_2 = R_2 Q_2$ (notice reverse of $Q_2 R_2 = A_1$)\\
+
+    $A_3 = \hat{Q}_3^H A \hat{Q}_3$\\
+    since $\hat{Q}_1 R_1 = A$\\
+    $A_3 = \hat{Q}_3^H \hat{Q}_1 R_1 \hat{Q}_3$\\
+    since $\hat{Q}_3 = \hat{Q}_1 Q_2 Q_3$\\
+    $A_3 = Q_3^H Q_2^H \hat{Q}_1^H \hat{Q}_1 R_1 \hat{Q}_1 Q_2 Q_3$\\
+    $A_3 = Q_3^H Q_2^H  R_1 \hat{Q}_1 Q_2 Q_3$\\
+    since $A_1 = R_1 \hat{Q}_1$\\
+    $A_3 = Q_3^H Q_2^H  A_1 Q_2 Q_3$\\
+    since $Q_2 R_2 = A_1$\\
+    $A_3 = Q_3^H Q_2^H Q_2 R_2 Q_2 Q_3$\\
+    $A_3 = Q_3^H R_2 Q_2 Q_3$\\
+    since $R_2 Q_2 = A_2$\\
+    $A_3 = Q_3^H A_2 Q_3$\\
+    factorize $Q_3 R_3 = A_2$\\
+    $A_3 = Q_3^H Q_3 R_3 Q_3$\\
+    $A_3 = R_3 Q_3$ (notice reverse of $Q_3 R_3 = A_2$)\\
+    ...\\
+
+    Thus $X_k$, and factoriaztion $\hat{Q}_k R_k = X_k$ is not calculated.\\
+    Convergence is checked on $A_k$ for (block) triangular form.\\
+    
+    \begin{algorithm}[H]
+      let $A_0 = A$\\
+      \For{$k=1..$}{
+        $Q_k R_k = A_{k-1}$ //normalize\\
+        $A_k = R_k Q_k$ //gen next iterate\\
+      }\\
+      \caption{QR Iteration Algo \label{Algo_QR_iteration}}
+    \end{algorithm}
+        
 \end{multicols*}
 \end {document}
 
