@@ -1,5 +1,5 @@
 \documentclass[8pt,letter]{article}
-
+ 
 %% \usepackage[fleqn]{amsmath}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amsfonts,amsthm,bm}
@@ -1643,8 +1643,8 @@
     $det(P^{-1}) = (-1)^S$\\
     where $S$ is the number of row exchanges from the permutation matrix $P$\\
     $det(A) = (-1)^S \prod_i L_{i,i} \prod_i U_{i,i}$\\
-    With implicit diagonal ones of $L$ in Algo \ref{Algo_LU_partial_pivot}:\\
-    $det(A) = (-1)^S \prod_i U_{i,i} = (-1)^S \prod_i A_{i,i}$\\
+    With implicit diagonal ones of $L$ in Algo \ref{Algo_LU_partial_pivot} and storage of $U$ in returned $A$:\\
+    $det(A) = (-1)^S \prod_i A_{i,i}$\\
     
     \vfill\null
     \pagebreak
