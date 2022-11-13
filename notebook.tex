@@ -1577,10 +1577,77 @@
     \section{Factorization}
     
     \subsection{LU}
-    TODO
+    
+    By design:
+    \begin{align*}
+      U&=MA\\
+      M^{-1} U &= A\\
+      LU &= A\\
+      L &= M^{-1} = (M_{n-1} .. M_1)^{-1}\\
+      L &= M_1^{-1}..M_{n-1}^{-1} = L_1 .. L_{n-1}
+    \end{align*}
 
+    With partial pivoting in rows:
+    \begin{align*}
+      PAx &= Pb\\
+      LU &= PA\\
+      LUx &= Pb\\
+      y &= Ux\ //solve\ for\ y\\
+      Ly &= Pb\\
+      Ux &= y\ //Solve\ for\ x
+    \end{align*}
+
+    \begin{algorithm}[H]
+      $P \leftarrow \begin{bmatrix} 0 & .. & n-1 \end{bmatrix}$//permute\ rows\\
+      $S \leftarrow 0$//row\ swaps\\
+      \For{$col\ in\ 0\ ..\ n$}{
+        let $rowmax \leftarrow $col\\
+        \For{$row\ in\ col+1\ ..\ n$}{
+          \uIf{$A_{row, col} > A_{rowmax,col}$}{
+            $rowmax \leftarrow row$\\
+          }
+        }
+        
+        swap($A_{rowmax, :}$, $A_{col, :}$)\\
+        swap($P_{rowmax}$, $P_{col}$)\\
+        $S \leftarrow S +  rowmax\ !=\ col\ ?\ 1\ :\ 0$\\
+
+        \uIf{$A_{col, col} < \epsilon_{tol}$}{
+          raise\ degenerate\ matrix\ error
+        }
+        \For{$row\ in\ col+1\ ..\ n$}{
+          $r \leftarrow A_{row, col} / A_{col,col}$\\
+          $A_{row, col} \leftarrow r$ //save value for $L$\\
+          //reduction for $U$\\
+          \For{$c\ in\ col+1\ ..\ n$}{
+            $A_{row,c} \leftarrow A_{row,c} - r A_{col, c}$\\
+          }
+        }
+      }
+      return $A, P, S$
+      \caption{LU with Partial Pivot \label{Algo_LU_partial_pivot}}
+    \end{algorithm}
+
+    $L$ stored in lower left triangle of $A$ with implicit diagonal ones.\\
+    
+    $U$ stored in upper right triangle of $A$.\\
+    
     \vfill\null
     \columnbreak
+
+    Determinant:\\
+    
+    $LU=PA$\\
+    $det(A) = det(P^{-1} LU)$\\
+    $det(A) = det(P^{-1}) det(L) det(U)$\\
+    $det(P^{-1}) = (-1)^S$\\
+    where $S$ is the number of row exchanges from the permutation matrix $P$\\
+    $det(A) = (-1)^S \prod_i L_{i,i} \prod_i U_{i,i}$\\
+    With implicit diagonal ones of $L$ in Algo \ref{Algo_LU_partial_pivot}:\\
+    $det(A) = (-1)^S \prod_i U_{i,i} = (-1)^S \prod_i A_{i,i}$\\
+    
+    \vfill\null
+    \pagebreak
     
     \subsection{QR}
     $A = QR$\\
@@ -1619,8 +1686,7 @@
     \columnbreak
         
     \subsubsection{Householder Reflection Method}
-    Idea: relfect vector so all coordinates but one disappear\\
-
+    Idea: relfect vector so all coordinates but one disappear.\\
     let $| \alpha | = \|x\|_2$\\
     $u \leftarrow x - \alpha e_1$\\
     $v = \frac{u}{\|u\|}$\\
@@ -1669,7 +1735,7 @@
     Solve with backsubstitution\\
 
     \vfill\null
-    \pagebreak
+    \columnbreak
     
     \section{Eigenvalues & Eigenvectors}
 
@@ -1773,6 +1839,7 @@
     $\hat{Q}_k$ orthogonal $\implies$ $\sigma(A) = \sigma(\hat{Q}_k^H A \hat{Q}_k)$\\
     $\hat{Q}_k A_k = A \hat{Q}_k$\\
     $A \hat{Q}_k = \hat{Q}_k A_k$\\
+    Shur Form of $A$:\\
     $A_k$ triangular / block triangular when it converges\\
 
     Avoiding explicit computation of $X_k$ and its factorization $\hat{Q}_k R_k = X_k$:\\
@@ -1836,7 +1903,9 @@
       }\\
       \caption{QR Iteration Algo \label{Algo_QR_iteration}}
     \end{algorithm}
-        
+
+    TODO 2
+    
 \end{multicols*}
 \end {document}
 
